@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31410.357
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PointCloudWeb.Server", "PointCloudWeb.Server.csproj", "{6B84C879-BF80-49D8-A8BF-6684DCF8CB64}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{6B84C879-BF80-49D8-A8BF-6684DCF8CB64}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6B84C879-BF80-49D8-A8BF-6684DCF8CB64}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6B84C879-BF80-49D8-A8BF-6684DCF8CB64}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6B84C879-BF80-49D8-A8BF-6684DCF8CB64}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {35A06321-6DBE-45B7-A530-8E2CED1AFE0C}
+	EndGlobalSection
+EndGlobal
