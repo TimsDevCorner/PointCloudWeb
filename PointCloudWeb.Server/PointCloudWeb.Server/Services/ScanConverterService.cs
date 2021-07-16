@@ -6,7 +6,6 @@ namespace PointCloudWeb.Server.Services
 {
     public class ScanConverterService
     {
-        private enum RotationAxis { X, Y, Z };
 
         private static void CorrectQuadrants(double angle, ref float sin, ref float cos)
         {
@@ -27,79 +26,42 @@ namespace PointCloudWeb.Server.Services
             }
         }
 
-        private static Matrix4x4 GetTransformationMatrix(ScanDataPoint scan, RotationAxis type)
-        {
-            double angle = type switch
-            {
-                RotationAxis.X => scan.RAX,//360 - 90 + scan.RAX,
-                RotationAxis.Y => -scan.RAY,//360 - scan.RAY,
-                RotationAxis.Z => 0,//360 - scan.RAY,
-                _ => throw new NotImplementedException(),
-            };
-
-            if (angle == 0)
-                return new Matrix4x4(
-                    1, 0, 0, 0,
-                    0, 1, 0, 0,
-                    0, 0, 1, 0,
-                    0, 0, 0, 1
-                    );
-
-            angle %= 360;
-            if (angle < 0)
-                angle += 360;
-
-            var angleInR = angle * (Math.PI / 180.0);
-
-            var sin = (float)Math.Sin(angleInR);
-            var cos = (float)Math.Cos(angleInR);
-
-            //CorrectQuadrants(angle, ref sin, ref cos);
-
-            return type switch
-            {
-                RotationAxis.X => new Matrix4x4(
-                                       1, 0, 0, 0,
-                                       0, cos, -sin, 0,
-                                       0, sin, cos, 0,
-                                       0, 0, 0, 1
-                                       ),
-                RotationAxis.Y => new Matrix4x4(
-                                      cos, 0, sin, 0,
-                                      0, 1, 0, 0,
-                                      -sin, 0, cos, 0,
-                                      0, 0, 0, 1
-                                      ),
-                RotationAxis.Z => new Matrix4x4(
-                                      cos, -sin, 0, 0,
-                                      sin, cos, 0, 0,
-                                      0, 0, 1, 0,
-                                      0, 0, 0, 1
-                                      ),
-                _ => throw new NotImplementedException(),
-            };
-        }
-
-
+        private int Round(double value) => (int)Math.Round(value, 0, MidpointRounding.AwayFromZero);
         public Point Transform(ScanDataPoint scan)
         {
-            Vector3 v = new Vector3(0, 0, 0);
+            var degreeXA = scan.RAX;
+            var degreeXB = 180 - 90 - degreeXA;
+            var degreeYA = scan.RAY;
+            var degreeYB = 180 - 90 - degreeYA;
 
-            v.Z = scan.DistanceMM;
+            var radXA = degreeXA * Math.PI / 180;
+            var radXB = degreeXB * Math.PI / 180;
+            var radYA = degreeYA * Math.PI / 180;
+            var radYB = degreeYB * Math.PI / 180;
 
-            var matrixX = GetTransformationMatrix(scan, RotationAxis.X);
-            var matrixY = GetTransformationMatrix(scan, RotationAxis.Y);
-            var matrixZ = GetTransformationMatrix(scan, RotationAxis.Z);
+            double sinXA = Math.Sin(radXA);
+            double sinXB = Math.Sin(radXB);
+            double sinYA = Math.Sin(radYA);
+            double sinYB = Math.Sin(radYB);
 
-            v = Vector3.Transform(v, matrixX);
-            v = Vector3.Transform(v, matrixY);
-            v = Vector3.Transform(v, matrixZ);
-
-            return new Point(
-                (int)Math.Round(v.X, 0, MidpointRounding.AwayFromZero),
-                (int)Math.Round(v.Y, 0, MidpointRounding.AwayFromZero),
-                (int)Math.Round(v.Z, 0, MidpointRounding.AwayFromZero)
+            var z = Math.Sqrt(
+                Math.Pow(
+                    Math.Pow(sinXB, 2) / Math.Pow(sinXA, 2)
+                    + Math.Pow(sinYB, 2) / Math.Pow(sinYA, 2)
+                    + 1
+                    , -1)
+                * Math.Pow(scan.DistanceMM, 2)
                 );
+
+
+            var p = new Point()
+            {
+                X = Round(z * sinYB / sinYA),
+                Y = Round(z * sinXB / sinXA),
+                Z = Round(z)
+            };
+
+            return p;
         }
     }
 }

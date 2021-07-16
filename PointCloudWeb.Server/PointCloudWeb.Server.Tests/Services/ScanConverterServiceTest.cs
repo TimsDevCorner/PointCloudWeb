@@ -10,33 +10,43 @@ namespace PointCloudWeb.Server.Tests.Services
 
         [Theory]
         [InlineData(1, 1, 1)]
-        //[InlineData(-1, 1, 1)]
-        //[InlineData(1, -1, 1)]
+        [InlineData(2, 2, 2)]
+        [InlineData(2, 1, 1)]
+        [InlineData(1, 2, 1)]
+        [InlineData(1, 1, 2)]
+        [InlineData(10, 15, 32)]
+        [InlineData(5, 12, 7)]
+
+        [InlineData(-1, 1, 1)]
+        [InlineData(1, -1, 1)]
+        [InlineData(-1, -1, 1)]
+        [InlineData(-5, 12, 7)]
+        [InlineData(-5, -12, 7)]
+        [InlineData(-22, 13, 11)]
+
         //[InlineData(1, 1, -1)]
-        //[InlineData(-1, -1, 1)]
         //[InlineData(-1, 1, -1)]
         //[InlineData(1, -1, -1)]
-
-
-        //[InlineData(10, 15, 32)]
-        //[InlineData(5, 12, 7)]
-        //[InlineData(-5, 12, 7)]
-        //[InlineData(5, -12, 7)]
         //[InlineData(5, 12, -7)]
-        //[InlineData(-5, -12, 7)]
         //[InlineData(-5, 12, -7)]
         //[InlineData(-5, -12, -7)]
-        //[InlineData(-22, 13, 11)]
         public static void ScanConverterTest(int x, int y, int z)
         {
             var scan = new ScanDataPoint
             {
-                RAX = 45,//(Math.Acos(y / Math.Sqrt(Math.Pow(x, 2) + Math.Pow(y, 2) + Math.Pow(z, 2))) * 180 / Math.PI),
-                RAY = 45,//(Math.Acos(z / Math.Sqrt(Math.Pow(z, 2) + Math.Pow(x, 2))) * 180 / Math.PI),
-                //RAY = 360 - (Math.Acos(z / Math.Sqrt(Math.Pow(z, 2) + Math.Pow(x, 2))) * 180 / Math.PI),
-                //RAY = 180 - (Math.Acos(z / Math.Sqrt(Math.Pow(z, 2) + Math.Pow(x, 2))) * 180 / Math.PI),
+                RAX = Math.Acos(y / Math.Sqrt(Math.Pow(y, 2) + Math.Pow(z, 2))),
+                RAY = Math.Acos(x / Math.Sqrt(Math.Pow(z, 2) + Math.Pow(x, 2))),
                 DistanceMM = (float)Math.Sqrt(Math.Pow(x, 2) + Math.Pow(y, 2) + Math.Pow(z, 2))
             };
+
+            //from rad to degree
+            scan.RAX = scan.RAX * 180 / Math.PI;
+            scan.RAY = scan.RAY * 180 / Math.PI;
+            var expected = new Point(x, y, z);
+
+            var service = new ScanConverterService();
+            var point = service.Transform(scan);
+            Assert.Equal(expected, point);
 
             //if (scan.RAX >= 0 && scan.RAX < 90)
             //    scan.RAY = 360 - scan.RAY;
@@ -55,18 +65,6 @@ namespace PointCloudWeb.Server.Tests.Services
             //    sin *= -1;
             //}
 
-            var expected = new Point(x, y, z);
-
-            var service = new ScanConverterService();
-            var point = service.Transform(scan);
-            //Assert.Equal(expected, point);
-            Assert.True(
-                point.X >= expected.X - 1 && point.X <= expected.X + 1
-                    && point.Y >= expected.Y - 1 && point.Y <= expected.Y + 1
-                    && point.Z >= expected.Z - 1 && point.Z <= expected.Z + 1,
-                    "expected: " + expected.ToString() + " \nactual:   " + point.ToString() +
-                    "\nAX: " + scan.RAX + "\n AY: " + scan.RAY
-                    );
         }
     }
 }
