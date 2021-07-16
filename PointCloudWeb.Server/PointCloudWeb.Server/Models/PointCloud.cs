@@ -6,21 +6,33 @@ namespace PointCloudWeb.Server.Models
 {
     public class Point
     {
-        public double X { get; set; }
-        public double Y { get; set; }
-        public double Z { get; set; }
+        public int X { get; set; }
+        public int Y { get; set; }
+        public int Z { get; set; }
 
 
         public Point() : this(0, 0, 0) { }
-        public Point(double x, double y, double z)
+        public Point(int x, int y, int z)
         {
             X = x;
             Y = y;
             Z = z;
         }
 
+        public override bool Equals(object obj)
+        {
+            if ((obj == null) || !GetType().Equals(obj.GetType()))
+                return false;
+            else
+            {
+                Point p = (Point)obj;
+                return (X == p.X) && (Y == p.Y) && (Z == p.Z);
+            }
+        }
+
 
         public override string ToString() => (X.ToString() + "  " + Y.ToString() + "  " + Z.ToString());
+        public override int GetHashCode() => HashCode.Combine(X, Y, Z);
     }
 
 
@@ -69,5 +81,4 @@ namespace PointCloudWeb.Server.Models
             Remove(GetById(id));
         }
     }
-
 }

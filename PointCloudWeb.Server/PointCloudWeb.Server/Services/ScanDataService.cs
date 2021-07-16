@@ -24,7 +24,7 @@ namespace PointCloudWeb.Server.Services
         {
             var list = new List<Point>();
 
-            foreach (var scan in scanData.List)
+            foreach (var scan in scanData.ScanPoints)
             {
                 list.Add(_scanConverterService.Transform(scan));
             }
