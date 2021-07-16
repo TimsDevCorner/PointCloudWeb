@@ -7,6 +7,7 @@ namespace PointCloudWeb.Server.Services
     public class ScanConverterService
     {
         private int Round(double value) => (int)Math.Round(double.IsNaN(value) ? 0 : value, 0, MidpointRounding.AwayFromZero);
+
         public Point Transform(ScanDataPoint scan)
         {
             var factorZ = 1;
@@ -42,7 +43,6 @@ namespace PointCloudWeb.Server.Services
                     , -1)
                 * Math.Pow(scan.DistanceMM, 2)
                 );
-
 
             var p = new Point()
             {

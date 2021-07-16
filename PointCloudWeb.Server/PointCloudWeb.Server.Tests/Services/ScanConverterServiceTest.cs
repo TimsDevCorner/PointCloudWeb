@@ -7,7 +7,6 @@ namespace PointCloudWeb.Server.Tests.Services
 {
     public class ScanConverterServiceTest
     {
-
         [Theory]
         [InlineData(2, 2, 2)]
         [InlineData(2, 1, 1)]
@@ -22,19 +21,16 @@ namespace PointCloudWeb.Server.Tests.Services
         [InlineData(0, 1, 1)]
         [InlineData(1, 0, 1)]
         [InlineData(1, 1, 1)]
-
         [InlineData(-1, 1, 1)]
         [InlineData(1, -1, 1)]
         [InlineData(-1, -1, 1)]
         [InlineData(-5, 12, 7)]
         [InlineData(-5, -12, 7)]
         [InlineData(-22, 13, 11)]
-
         [InlineData(0, 0, -1)]
         [InlineData(0, -1, -1)]
         [InlineData(-1, 0, -1)]
         [InlineData(-1, -1, -1)]
-
         [InlineData(1, 1, -1)]
         [InlineData(5, 12, -7)]
         [InlineData(-1, 1, -1)]
@@ -70,7 +66,6 @@ namespace PointCloudWeb.Server.Tests.Services
             var service = new ScanConverterService();
             var point = service.Transform(scan);
             Assert.Equal(expected, point);
-
         }
     }
 }

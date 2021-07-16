@@ -15,11 +15,6 @@ namespace PointCloudWeb.Server.Services
             _scanConverterService = scanConverterService;
         }
 
-        public void AddScan(ScanDataList scanData)
-        {
-            _pointCloudService.AddPoints(scanData.Id, ConvertToPoints(scanData));
-        }
-
         private IList<Point> ConvertToPoints(ScanDataList scanData)
         {
             var list = new List<Point>();
@@ -30,6 +25,11 @@ namespace PointCloudWeb.Server.Services
             }
 
             return list;
+        }
+
+        public void AddScan(ScanDataList scanData)
+        {
+            _pointCloudService.AddPoints(scanData.Id, ConvertToPoints(scanData));
         }
     }
 }

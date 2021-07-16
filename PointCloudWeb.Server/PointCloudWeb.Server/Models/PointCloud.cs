@@ -6,18 +6,20 @@ namespace PointCloudWeb.Server.Models
 {
     public class Point
     {
-        public int X { get; set; }
-        public int Y { get; set; }
-        public int Z { get; set; }
+        public Point() : this(0, 0, 0)
+        {
+        }
 
-
-        public Point() : this(0, 0, 0) { }
         public Point(int x, int y, int z)
         {
             X = x;
             Y = y;
             Z = z;
         }
+
+        public int X { get; set; }
+        public int Y { get; set; }
+        public int Z { get; set; }
 
         public override bool Equals(object obj)
         {
@@ -30,33 +32,27 @@ namespace PointCloudWeb.Server.Models
             }
         }
 
+        public override int GetHashCode() => HashCode.Combine(X, Y, Z);
 
         public override string ToString() => (X.ToString() + "  " + Y.ToString() + "  " + Z.ToString());
-        public override int GetHashCode() => HashCode.Combine(X, Y, Z);
     }
-
 
     public class PointCloud
     {
-        public Guid Id { get; private set; }
-        public string Name { get; set; }
-        public IList<Point> Points { get; private set; }
-
         public PointCloud(String name, Guid id)
         {
             Points = new List<Point>();
             Id = id;
             Name = name;
         }
+
+        public Guid Id { get; private set; }
+        public string Name { get; set; }
+        public IList<Point> Points { get; private set; }
     }
 
     public class PointCloudCollection : List<PointCloud>
     {
-        public PointCloud GetById(Guid id)
-        {
-            return this.First(pc => pc.Id == id);
-        }
-
         public PointCloud AddNew()
         {
             var id = Guid.NewGuid();
@@ -68,6 +64,11 @@ namespace PointCloudWeb.Server.Models
         public bool Contains(Guid id)
         {
             return this.Any(pc => pc.Id == id);
+        }
+
+        public PointCloud GetById(Guid id)
+        {
+            return this.First(pc => pc.Id == id);
         }
 
         public void RemoveById(Guid id)
