@@ -42,12 +42,6 @@ namespace PointCloudWeb.Server.Models
         public string Name { get; set; }
         public IList<Point> Points { get; private set; }
 
-        /// <summary>
-        ///     Function <c>ScaleFactor</c> defines relation between X/Y/Z distances in mm
-        ///     So, Point A(0,0,0) is 1mm from B(1,0,0) apart
-        /// </summary>
-        public static int ScaleFactor() => 1;
-
         public PointCloud(String name, Guid id)
         {
             Points = new List<Point>();
