@@ -1,13 +1,11 @@
 using System;
-using System.Numerics;
 using PointCloudWeb.Server.Models;
+using PointCloudWeb.Server.Utils;
 
 namespace PointCloudWeb.Server.Services
 {
     public class ScanConverterService
     {
-        private int Round(double value) => (int)Math.Round(double.IsNaN(value) ? 0 : value, 0, MidpointRounding.AwayFromZero);
-
         public Point Transform(ScanDataPoint scan)
         {
             var factorZ = 1;
@@ -46,9 +44,9 @@ namespace PointCloudWeb.Server.Services
 
             var p = new Point()
             {
-                X = Round(z * sinYB / sinYA),
-                Y = Round(z * sinXB / sinXA),
-                Z = factorZ * Round(z)
+                X = NumericUtils.Round(z * sinYB / sinYA),
+                Y = NumericUtils.Round(z * sinXB / sinXA),
+                Z = factorZ * NumericUtils.Round(z)
             };
 
             return p;

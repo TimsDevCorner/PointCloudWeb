@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using PointCloudWeb.Server.Models;
 using PointCloudWeb.Server.Services;
+using System;
 
 namespace PointCloudWeb.Server.Controllers
 {
@@ -8,17 +9,23 @@ namespace PointCloudWeb.Server.Controllers
     [Route("[controller]")]
     public class DataController : ControllerBase
     {
-        private readonly DataService _scanDataService;
+        private readonly DataService scanDataService;
 
         public DataController(DataService scanDataService)
         {
-            _scanDataService = scanDataService;
+            this.scanDataService = scanDataService;
         }
 
         [HttpPost]
         public void PostScanData([FromBody] ScanDataList data)
         {
-            _scanDataService.AddScan(data);
+            scanDataService.AddScan(data);
+        }
+
+        [HttpPut]
+        public void ScanFinished(Guid id)
+        {
+            scanDataService.ScanFinished(id);
         }
     }
 }

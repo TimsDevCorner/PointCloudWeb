@@ -6,16 +6,18 @@ namespace PointCloudWeb.Server.Services
 {
     public class PointCloudService
     {
-        private readonly PointCloudCollection _pointClouds;
+        private readonly IPointCloudRegistationService pointCloudRegistation;
+        private readonly PointCloudCollection pointClouds;
 
-        public PointCloudService()
+        public PointCloudService(IPointCloudRegistationService pointCloudRegistation)
         {
-            _pointClouds = new PointCloudCollection();
+            pointClouds = new PointCloudCollection();
+            this.pointCloudRegistation = pointCloudRegistation;
         }
 
         private void RaiseIfNotExists(Guid id)
         {
-            if (!_pointClouds.Contains(id))
+            if (!pointClouds.Contains(id))
                 throw new ArgumentOutOfRangeException("The Id {0} was not found!", id.ToString());
         }
 
@@ -23,7 +25,7 @@ namespace PointCloudWeb.Server.Services
         {
             RaiseIfNotExists(id);
 
-            var pc = _pointClouds.GetById(id);
+            var pc = pointClouds.GetById(id);
 
             foreach (var point in points)
                 pc.Points.Add(point);
@@ -31,16 +33,21 @@ namespace PointCloudWeb.Server.Services
 
         public void RegisterPointCloud(Guid id)
         {
-            RegisterPointClouds(new List<Guid>() { id });
+            RaiseIfNotExists(id);
+            var pointCloud = pointClouds.GetById(id);
+
+            //the first can't be registered
+            if (pointClouds.IndexOf(pointCloud) == 0)
+                return;
+
+            var transformation = pointCloudRegistation.RegisterPointCloud(pointCloud, pointClouds[0]);
+            pointCloud.Transformation = transformation;
         }
 
-        public void RegisterPointClouds(IList<Guid> ids)
+        public void RegisterPointClouds()
         {
-            //ensure that every element in "ids" is in "_pointClouds"
-            foreach (var id in ids)
-                RaiseIfNotExists(id);
-
-            throw new NotImplementedException();
+            foreach (var pointCloud in pointClouds)
+                RegisterPointCloud(pointCloud.Id);
         }
     }
 }
