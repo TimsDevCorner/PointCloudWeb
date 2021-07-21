@@ -31,6 +31,16 @@ namespace PointCloudWeb.Server.Services
                 pc.Points.Add(point);
         }
 
+        public IList<PointCloud> GetAll()
+        {
+            return pointClouds;
+        }
+
+        public PointCloud GetById(Guid id)
+        {
+            return pointClouds.GetById(id);
+        }
+
         public void RegisterPointCloud(Guid id)
         {
             RaiseIfNotExists(id);
