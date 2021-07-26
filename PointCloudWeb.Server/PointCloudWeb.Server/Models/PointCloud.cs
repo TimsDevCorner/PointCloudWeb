@@ -46,7 +46,7 @@ namespace PointCloudWeb.Server.Models
         private ObservableCollection<Point> points;
         private Matrix4x4 transformation;
 
-        public PointCloud(string name, Guid id)
+        public PointCloud(Guid id, string name)
         {
             points = new ObservableCollection<Point>();
             points.CollectionChanged += PointsCollectionChanged;
@@ -110,7 +110,7 @@ namespace PointCloudWeb.Server.Models
         public PointCloud AddNew()
         {
             var id = Guid.NewGuid();
-            var pc = new PointCloud(id.ToString(), id);
+            var pc = new PointCloud(id, "Scan #" + (Count + 1).ToString());
             Add(pc);
             return pc;
         }
