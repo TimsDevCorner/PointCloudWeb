@@ -1,0 +1,25 @@
+
+
+
+#map-settings {
+    grid-area: right;
+    border-left: 1px solid black;
+    height: 100vw;
+    padding: 0px;
+}
+
+#map {
+    grid-area: main;
+}
+
+
+.map-grid-container {
+    display: grid;
+    grid-template-areas:
+      'header header header header header header'
+      'main main main main main right'
+      'footer footer footer footer footer footer';
+    height: 100vw;
+    grid-gap: 0px;
+    padding: 0px;
+}

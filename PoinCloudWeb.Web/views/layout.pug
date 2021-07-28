@@ -2,7 +2,9 @@ doctype html
 html
 	head
 		title= title
-		link(rel='stylesheet', href='/stylesheets/style.css')
+		block scripts
+		block links
+		link(rel='stylesheet', href='/stylesheets/layout.css')
 		script(src='/javascripts/layout.js')
 	body
 		div.navbar
@@ -10,5 +12,4 @@ html
 			div
 				button(onclick="onClickScanner()") Scanner 
 				button(onclick="onClickMap()") Map
-		div.content
-			block content
+		block content

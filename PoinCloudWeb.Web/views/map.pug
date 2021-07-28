@@ -1,7 +1,16 @@
 extends layout
 
-block content
-	h1 Welcome to #{title}
-	h1 Map
 
-    
+block scripts
+	script(src='/javascripts/map.js')
+block links
+	link(rel='stylesheet', href='/stylesheets/map.css')
+
+block content
+	div.map-grid-container
+		div#map-settings
+			ul
+				li Item 1
+				li Item 2
+		div(id="map", class="content-padding")
+			p content
