@@ -1,6 +1,7 @@
 var createError = require('http-errors');
 var express = require('express');
 var path = require('path');
+var favicon = require('serve-favicon')
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 
@@ -21,6 +22,8 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')))
+
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 
@@ -39,5 +42,6 @@ app.use(function (err, req, res, next) {
   res.status(err.status || 500);
   res.render('error', globals);
 });
+
 
 module.exports = app;
