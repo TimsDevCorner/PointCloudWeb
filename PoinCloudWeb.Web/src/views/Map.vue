@@ -9,10 +9,7 @@
 							+scan(scan) -->
         </ul>
         <ul v-for="item in items" :key="item">
-          <li>
-            <p>{{ item }}</p>
-            <ScanItem />
-          </li>
+          <li><ScanItem /></li>
         </ul>
       </div>
     </div>

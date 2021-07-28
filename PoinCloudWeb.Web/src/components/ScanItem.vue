@@ -1,26 +1,48 @@
 <template>
   <div>
-    <button>Test</button>
-    <md-icon>thumb_up</md-icon>
-    <!-- button(id="Visible" + scan.id, onclick="buttonVisibleClicked("+scan.id+")"
-    type="button", class="fa fa-eye") button(id="Edit" + scan.id, type="button",
-    class="fa fa-edit") p(id="Label" + scan.id)= scan.name -->
+    <font-awesome-icon class="icon" :icon="iconName" @click="onClickVisible" />
+    <font-awesome-icon class="icon" icon="edit" />
+    <p>Scan Name</p>
+    <!--     
+    button(id="Visible" + scan.id, onclick="buttonVisibleClicked("+scan.id+")"type="button", class="fa fa-eye") 
+    button(id="Edit" + scan.id, type="button",class="fa fa-edit") 
+    p(id="Label" + scan.id)= scan.name -->
   </div>
 </template>
 
 <script>
+// import MenuIcon from "vue-material-design-icons/Menu.vue";
+
 export default {
   name: "ScanItem",
-  //   methods: {
-  //     onClickMain: function () {
-  //       this.$router.push("/");
-  //     },
-  //     onClickScanner: function () {
-  //       this.$router.push("/scanner");
-  //     },
-  //     onClickMap: function () {
-  //       this.$router.push("/map");
-  //     },
-  //   },
+  data: function () {
+    return {
+      visible: true,
+    };
+  },
+  methods: {
+    onClickVisible: function () {
+      this.visible = !this.visible;
+    },
+  },
+  computed: {
+    iconName: function () {
+      if (this.visible) return "eye";
+      else return "eye-slash";
+    },
+  },
 };
 </script>
+
+<style scoped>
+.icon {
+  margin-right: 5px;
+}
+
+p {
+  display: inline-block;
+  margin: 0px;
+  margin-left: 5px;
+  font-size: 0.8em;
+}
+</style>e
