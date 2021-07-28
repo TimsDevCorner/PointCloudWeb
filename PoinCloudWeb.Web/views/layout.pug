@@ -1,0 +1,14 @@
+doctype html
+html
+	head
+		title= title
+		link(rel='stylesheet', href='/stylesheets/style.css')
+		script(src='/javascripts/layout.js')
+	body
+		div.navbar
+			button(id="navbar-caption", onclick="onClickMain()")= title
+			div
+				button(onclick="onClickScanner()") Scanner 
+				button(onclick="onClickMap()") Map
+		div.content
+			block content
