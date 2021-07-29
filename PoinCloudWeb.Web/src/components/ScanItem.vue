@@ -2,36 +2,52 @@
   <div>
     <font-awesome-icon class="icon" :icon="iconName" @click="onClickVisible" />
     <font-awesome-icon class="icon" icon="edit" @click="onClickEdit" />
-    <p>Scan Name</p>
-    <!--     
-    button(id="Visible" + scan.id, onclick="buttonVisibleClicked("+scan.id+")"type="button", class="fa fa-eye") 
-    button(id="Edit" + scan.id, type="button",class="fa fa-edit") 
-    p(id="Label" + scan.id)= scan.name -->
+    <p @click="onClickEdit()">Scan Name</p>
+    <div id="settings" class="collapsed">
+      <div id="settings-container">
+        <div>
+          <input type="text" value="Scan Name" />
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
-// import MenuIcon from "vue-material-design-icons/Menu.vue";
-
 export default {
   name: "ScanItem",
-  data: function () {
+  data() {
     return {
-      visible: true,
+      isVisible: true,
+      isCollapsed: true,
     };
   },
   methods: {
-    onClickVisible: function () {
-      this.visible = !this.visible;
+    onClickVisible() {
+      this.isVisible = !this.isVisible;
     },
-    onClickEdit: function () {
-      alert("Edit!");
+    onClickEdit() {
+      this.isCollapsed = !this.isCollapsed;
+
+      const settings = document.getElementById("settings");
+      if (this.isCollapsed) {
+        settings.style.height = 0;
+      } else {
+        const container = document.getElementById("settings-container");
+        settings.style.height = this.outerHeight(container) + "px";
+      }
+    },
+    outerHeight(el) {
+      var width = el.offsetHeight;
+      const style = getComputedStyle(el);
+
+      width += parseInt(style.marginTop) + parseInt(style.marginTop);
+      return width;
     },
   },
   computed: {
-    iconName: function () {
-      if (this.visible) return "eye";
-      else return "eye-slash";
+    iconName() {
+      return this.isVisible ? "eye" : "eye-slash";
     },
   },
 };
@@ -49,5 +65,28 @@ p {
   margin: 0px;
   margin-left: 5px;
   font-size: 0.8em;
+  cursor: pointer;
+  user-select: none;
+}
+
+#settings {
+  -moz-transition: height 0.3s;
+  -ms-transition: height 0.3s;
+  -o-transition: height 0.3s;
+  -webkit-transition: height 0.3s;
+  transition: height 0.3s;
+  height: 0;
+  overflow: hidden;
+}
+
+#settings-container {
+  padding: 10px;
+
+  margin-left: 25px;
+  margin-top: 10px;
+  margin-bottom: 30px;
+  border-style: solid;
+  border-width: 1px;
+  border-color: grey;
 }
 </style>e
