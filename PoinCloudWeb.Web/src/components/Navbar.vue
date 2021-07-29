@@ -12,17 +12,6 @@
 <script>
 export default {
   name: "NavBar",
-  //   methods: {
-  //     onClickMain: function () {
-  //       this.$router.push("/");
-  //     },
-  //     onClickScanner: function () {
-  //       this.$router.push("/scanner");
-  //     },
-  //     onClickMap: function () {
-  //       this.$router.push("/map");
-  //     },
-  //   },
 };
 </script>
 

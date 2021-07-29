@@ -1,7 +1,7 @@
 <template>
   <div>
     <font-awesome-icon class="icon" :icon="iconName" @click="onClickVisible" />
-    <font-awesome-icon class="icon" icon="edit" />
+    <font-awesome-icon class="icon" icon="edit" @click="onClickEdit" />
     <p>Scan Name</p>
     <!--     
     button(id="Visible" + scan.id, onclick="buttonVisibleClicked("+scan.id+")"type="button", class="fa fa-eye") 
@@ -24,6 +24,9 @@ export default {
     onClickVisible: function () {
       this.visible = !this.visible;
     },
+    onClickEdit: function () {
+      alert("Edit!");
+    },
   },
   computed: {
     iconName: function () {
@@ -37,6 +40,8 @@ export default {
 <style scoped>
 .icon {
   margin-right: 5px;
+  width: 25px;
+  cursor: pointer;
 }
 
 p {
