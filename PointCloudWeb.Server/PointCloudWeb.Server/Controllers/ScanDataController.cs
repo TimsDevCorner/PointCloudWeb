@@ -9,9 +9,9 @@ namespace PointCloudWeb.Server.Controllers
     [Route("[controller]")]
     public class DataController : ControllerBase
     {
-        private readonly DataService scanDataService;
+        private readonly ScanDataService scanDataService;
 
-        public DataController(DataService scanDataService)
+        public DataController(ScanDataService scanDataService)
         {
             this.scanDataService = scanDataService;
         }

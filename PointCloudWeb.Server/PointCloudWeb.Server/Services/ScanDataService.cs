@@ -4,12 +4,12 @@ using PointCloudWeb.Server.Models;
 
 namespace PointCloudWeb.Server.Services
 {
-    public class DataService
+    public class ScanDataService
     {
         private readonly PointCloudService pointCloudService;
         private readonly ScanConverterService scanConverterService;
 
-        public DataService(PointCloudService pointCloudService, ScanConverterService scanConverterService)
+        public ScanDataService(PointCloudService pointCloudService, ScanConverterService scanConverterService)
         {
             this.pointCloudService = pointCloudService;
             this.scanConverterService = scanConverterService;

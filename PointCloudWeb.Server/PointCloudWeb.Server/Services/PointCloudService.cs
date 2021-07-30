@@ -6,13 +6,22 @@ namespace PointCloudWeb.Server.Services
 {
     public class PointCloudService
     {
-        private readonly IPointCloudRegistationService pointCloudRegistation;
+        //private readonly IPointCloudRegistationService pointCloudRegistation;
         private readonly PointCloudCollection pointClouds;
 
-        public PointCloudService(IPointCloudRegistationService pointCloudRegistation)
+        public PointCloudService(/*IPointCloudRegistationService pointCloudRegistation*/)
         {
             pointClouds = new PointCloudCollection();
-            this.pointCloudRegistation = pointCloudRegistation;
+            //this.pointCloudRegistation = pointCloudRegistation;
+            InitSamleData();
+        }
+
+        private void InitSamleData()
+        {
+            pointClouds.Add(new PointCloud(Guid.NewGuid(), "Scan 1"));
+            pointClouds.Add(new PointCloud(Guid.NewGuid(), "Scan 2"));
+            pointClouds.Add(new PointCloud(Guid.NewGuid(), "Scan 3"));
+            pointClouds.Add(new PointCloud(Guid.NewGuid(), "Scan 4"));
         }
 
         private void RaiseIfNotExists(Guid id)
@@ -50,8 +59,8 @@ namespace PointCloudWeb.Server.Services
             if (pointClouds.IndexOf(pointCloud) == 0)
                 return;
 
-            var transformation = pointCloudRegistation.RegisterPointCloud(pointCloud, pointClouds[0]);
-            pointCloud.Transformation = transformation;
+            //var transformation = pointCloudRegistation.RegisterPointCloud(pointCloud, pointClouds[0]);
+            //pointCloud.Transformation = transformation;
         }
 
         public void RegisterPointClouds()

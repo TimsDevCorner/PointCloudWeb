@@ -3,3 +3,4 @@ bin/
 obj/
 .vscode/
 node_modules/
+*.csproj.user

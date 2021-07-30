@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace PointCloudWeb.Server.Models
 {
@@ -31,5 +32,10 @@ namespace PointCloudWeb.Server.Models
         public double RAX { get; set; }
 
         public double RAY { get; set; }
+
+        public override string ToString()
+        {
+            return String.Join(", ", new string[] { RAY.ToString(), RAX.ToString(), DistanceMM.ToString() });
+        }
     }
 }

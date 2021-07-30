@@ -18,7 +18,7 @@ namespace PointCloudWeb.Server.Controllers
             this.pointCloudService = pointCloudService;
         }
 
-        private PointCloudDto ConvertPointCloudToDto(PointCloud pc) => new PointCloudDto(pc.Id, pc.Name, pc.TransformedPoints);
+        private PointCloudDto ConvertPointCloudToDto(PointCloud pc) => new PointCloudDto(pc.Id, pc.TransformedPoints);
 
         [HttpGet]
         public IList<PointCloudDto> GetAll()

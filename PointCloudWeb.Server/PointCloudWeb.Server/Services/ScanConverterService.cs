@@ -8,17 +8,18 @@ namespace PointCloudWeb.Server.Services
     {
         public Point Transform(ScanDataPoint scan)
         {
-            var factorZ = 1;
+            if (scan.RAX >= 180 || scan.RAY >= 180)
+                return new Point(0, 0, 0);
 
             var degreeXA = scan.RAX;
             var degreeYA = scan.RAY;
 
-            if (degreeXA > 270 && degreeYA > 270)
-            {
-                degreeXA -= 270;
-                degreeYA -= 270;
-                factorZ = -1;
-            }
+            //if (degreeXA > 270 && degreeYA > 270)
+            //{
+            //    degreeXA -= 270;
+            //    degreeYA -= 270;
+            //    factorZ = -1;
+            //}
 
             var degreeXB = 180 - 90 - degreeXA;
             var degreeYB = 180 - 90 - degreeYA;
@@ -46,7 +47,7 @@ namespace PointCloudWeb.Server.Services
             {
                 X = NumericUtils.Round(z * sinYB / sinYA),
                 Y = NumericUtils.Round(z * sinXB / sinXA),
-                Z = factorZ * NumericUtils.Round(z)
+                Z = NumericUtils.Round(z)
             };
 
             return p;
