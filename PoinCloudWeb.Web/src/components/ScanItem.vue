@@ -1,12 +1,20 @@
 <template>
   <div>
     <font-awesome-icon class="icon" :icon="iconName" @click="onClickVisible" />
-    <font-awesome-icon class="icon" icon="edit" @click="onClickEdit" />
-    <p @click="onClickEdit()">Scan Name</p>
-    <div id="settings" class="collapsed">
-      <div id="settings-container">
+    <p @click="onClickEdit()">{{ item.name }}</p>
+    <div id="settings" ref="settings" class="collapsed">
+      <div id="settings-container" ref="settings-container">
         <div>
           <input type="text" value="Scan Name" />
+
+          <button>
+            <font-awesome-icon class="icon" icon="edit"></font-awesome-icon>
+            <p>Save</p>
+          </button>
+          <button @click="onClickEdit()">
+            <font-awesome-icon class="icon" icon="edit"></font-awesome-icon>
+            <p>Cancel</p>
+          </button>
         </div>
       </div>
     </div>
@@ -16,6 +24,7 @@
 <script>
 export default {
   name: "ScanItem",
+  props: ["item"],
   data() {
     return {
       isVisible: true,
@@ -29,12 +38,11 @@ export default {
     onClickEdit() {
       this.isCollapsed = !this.isCollapsed;
 
-      const settings = document.getElementById("settings");
       if (this.isCollapsed) {
-        settings.style.height = 0;
+        this.$refs.settings.style.height = 0;
       } else {
-        const container = document.getElementById("settings-container");
-        settings.style.height = this.outerHeight(container) + "px";
+        this.$refs.settings.style.height =
+          this.outerHeight(this.$refs["settings-container"]) + "px";
       }
     },
     outerHeight(el) {

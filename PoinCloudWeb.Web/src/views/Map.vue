@@ -8,8 +8,8 @@
 						li
 							+scan(scan) -->
         </ul>
-        <ul v-for="item in items" :key="item">
-          <li><ScanItem /></li>
+        <ul v-for="item in cloudItems" :key="item">
+          <li><ScanItem :item="item" /></li>
         </ul>
       </div>
     </div>
@@ -25,6 +25,9 @@
 import ScanItem from "@/components/ScanItem";
 
 export default {
+  created() {
+    this.$store.dispatch("pci/loadPointClouds");
+  },
   data() {
     return {
       items: [
@@ -34,6 +37,11 @@ export default {
         7, 2, 3, 4, 5, 6, 7, 2, 3, 4, 5, 6, 7, 2, 3, 4, 5, 6,
       ],
     };
+  },
+  computed: {
+    cloudItems() {
+      return this.$store.state.pci.pointClouds;
+    },
   },
   components: { ScanItem },
 };

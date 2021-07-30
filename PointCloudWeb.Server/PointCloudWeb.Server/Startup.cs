@@ -32,6 +32,9 @@ namespace PointCloudWeb.Server
             }
 
             app.UseRouting();
+            app.UseCors(options => {
+                options.AllowAnyOrigin();
+            });
 
             //app.UseAuthorization();
 

@@ -4,6 +4,7 @@ import router from './router'
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { faEdit, faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
+import store from "./store/store.js"
 
 library.add(faEdit, faEye, faEyeSlash)
 
@@ -12,6 +13,7 @@ library.add(faEdit, faEye, faEyeSlash)
 
 const app = createApp(App)
     .use(router)
+    .use(store)
     .component('font-awesome-icon', FontAwesomeIcon);
 
 app.mount('#app')
