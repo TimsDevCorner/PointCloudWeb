@@ -7,6 +7,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PointCloudWeb.Server", "Poi
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PointCloudWeb.Server.Tests", "PointCloudWeb.Server.Tests\PointCloudWeb.Server.Tests.csproj", "{A2493168-0373-460F-8F1D-48F62ED804BA}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PointCloudWeb.Server.ScanConverter", "PointCloudWeb.Server.ScanConverter\PointCloudWeb.Server.ScanConverter.csproj", "{BC69BBF4-FA13-44F4-97C3-2D49E4951087}"
+	ProjectSection(ProjectDependencies) = postProject
+		{BD246537-F063-4A5A-8957-AF25E021132D} = {BD246537-F063-4A5A-8957-AF25E021132D}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +26,10 @@ Global
 		{A2493168-0373-460F-8F1D-48F62ED804BA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A2493168-0373-460F-8F1D-48F62ED804BA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A2493168-0373-460F-8F1D-48F62ED804BA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BC69BBF4-FA13-44F4-97C3-2D49E4951087}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BC69BBF4-FA13-44F4-97C3-2D49E4951087}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BC69BBF4-FA13-44F4-97C3-2D49E4951087}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BC69BBF4-FA13-44F4-97C3-2D49E4951087}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
