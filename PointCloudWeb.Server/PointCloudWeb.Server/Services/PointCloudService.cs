@@ -68,5 +68,10 @@ namespace PointCloudWeb.Server.Services
             foreach (var pointCloud in pointClouds)
                 RegisterPointCloud(pointCloud.Id);
         }
+
+        public void RemoveById(Guid id)
+        {
+            pointClouds.RemoveById(id);
+        }
     }
 }

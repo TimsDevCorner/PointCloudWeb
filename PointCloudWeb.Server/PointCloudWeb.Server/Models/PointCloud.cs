@@ -122,7 +122,7 @@ namespace PointCloudWeb.Server.Models
 
         public PointCloud GetById(Guid id)
         {
-            return this.Find(pc => pc.Id == id);
+            return Find(pc => pc.Id == id);
         }
 
         public void RemoveById(Guid id)

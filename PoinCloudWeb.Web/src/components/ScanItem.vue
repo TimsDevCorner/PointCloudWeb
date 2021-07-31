@@ -5,15 +5,24 @@
     <div id="settings" ref="settings" class="collapsed">
       <div id="settings-container" ref="settings-container">
         <div>
-          <input type="text" value="Scan Name" />
+          <input
+            ref="focusElement"
+            type="text"
+            v-model="editPcName"
+            @keyup.enter="onEnter()"
+          />
 
-          <button>
+          <button @click="onClickSave()">
             <font-awesome-icon class="icon" icon="edit"></font-awesome-icon>
             <p>Save</p>
           </button>
           <button @click="onClickEdit()">
-            <font-awesome-icon class="icon" icon="edit"></font-awesome-icon>
+            <font-awesome-icon class="icon" icon="times"></font-awesome-icon>
             <p>Cancel</p>
+          </button>
+          <button @click="onClickDelete()">
+            <font-awesome-icon class="icon" icon="trash"></font-awesome-icon>
+            <p>Delete</p>
           </button>
         </div>
       </div>
@@ -29,11 +38,15 @@ export default {
     return {
       isVisible: true,
       isCollapsed: true,
+      editPcName: "",
     };
   },
   methods: {
     onClickVisible() {
       this.isVisible = !this.isVisible;
+    },
+    onEnter() {
+      this.onClickSave();
     },
     onClickEdit() {
       this.isCollapsed = !this.isCollapsed;
@@ -41,9 +54,24 @@ export default {
       if (this.isCollapsed) {
         this.$refs.settings.style.height = 0;
       } else {
+        this.editPcName = this.item.name;
         this.$refs.settings.style.height =
           this.outerHeight(this.$refs["settings-container"]) + "px";
+        setTimeout(() => this.$refs.focusElement.focus(), 100);
       }
+    },
+    onClickSave() {
+      this.$store.dispatch("pci/updatePointCloud", {
+        id: this.item.id,
+        name: this.editPcName,
+      });
+      this.onClickEdit();
+    },
+    onClickDelete() {
+      this.$store.dispatch("pci/deletePointCloud", {
+        id: this.item.id,
+        name: this.editPcName,
+      });
     },
     outerHeight(el) {
       var width = el.offsetHeight;
@@ -78,11 +106,11 @@ p {
 }
 
 #settings {
-  -moz-transition: height 0.3s;
-  -ms-transition: height 0.3s;
-  -o-transition: height 0.3s;
-  -webkit-transition: height 0.3s;
-  transition: height 0.3s;
+  -moz-transition: height 0.1s;
+  -ms-transition: height 0.1s;
+  -o-transition: height 0.1s;
+  -webkit-transition: height 0.1s;
+  transition: height 0.1s;
   height: 0;
   overflow: hidden;
 }

@@ -40,6 +40,17 @@ namespace PointCloudWeb.Server.Controllers
             return ConvertPointCloudToDto(pc);
         }
 
+        [HttpDelete]
+        [Route("{id:Guid}")]
+        public ActionResult RemoveById(Guid id)
+        {
+            if (pointCloudService.GetById(id) == null)
+                return new NotFoundResult();
+
+            pointCloudService.RemoveById(id);
+            return new OkResult();
+        }
+
         [HttpPut]
         public ActionResult<PointCloudInfoDto> UpdatePointCloud([FromBody] PointCloudInfoDto newPc)
         {
