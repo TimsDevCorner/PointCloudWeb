@@ -1,7 +1,7 @@
 <template>
   <div>
     <font-awesome-icon class="icon" :icon="iconName" @click="onClickVisible" />
-    <p @click="onClickEdit()">{{ item.name }}</p>
+    <p class="caption" @click="onClickEdit()">{{ item.name }}</p>
     <div id="settings" ref="settings" class="collapsed">
       <div id="settings-container" ref="settings-container">
         <div>
@@ -12,23 +12,25 @@
             @keyup.enter="onEnter()"
           />
 
+          <button class="button-delete" @click="onClickDelete()">
+            <font-awesome-icon class="icon" icon="trash"></font-awesome-icon>
+            <p class="button-text">Delete</p>
+          </button>
+
           <button @click="onClickSave()">
             <font-awesome-icon class="icon" icon="edit"></font-awesome-icon>
-            <p>Save</p>
+            <p class="button-text">Save</p>
           </button>
           <button @click="onClickEdit()">
             <font-awesome-icon class="icon" icon="times"></font-awesome-icon>
-            <p>Cancel</p>
-          </button>
-          <button @click="onClickDelete()">
-            <font-awesome-icon class="icon" icon="trash"></font-awesome-icon>
-            <p>Delete</p>
+            <p class="button-text">Cancel</p>
           </button>
         </div>
       </div>
     </div>
   </div>
 </template>
+
 
 <script>
 export default {
@@ -96,13 +98,23 @@ export default {
   cursor: pointer;
 }
 
-p {
+.caption {
   display: inline-block;
   margin: 0px;
   margin-left: 5px;
   font-size: 0.8em;
   cursor: pointer;
   user-select: none;
+}
+
+.button-delete {
+  display: inline-block;
+  margin-left: 10px;
+}
+
+.button-text {
+  display: inline-block;
+  margin: 0px;
 }
 
 #settings {
@@ -125,4 +137,4 @@ p {
   border-width: 1px;
   border-color: grey;
 }
-</style>e
+</style>

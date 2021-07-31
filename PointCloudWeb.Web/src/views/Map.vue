@@ -11,9 +11,6 @@
     </div>
     <div id="map" class="content-padding">
       <h1>Place the Point Cloud visualization here</h1>
-      <ul v-for="item in items" :key="item">
-        <li>{{ item }}</li>
-      </ul>
     </div>
   </div>
 </template>
@@ -23,16 +20,6 @@ import ScanItem from "@/components/ScanItem";
 export default {
   created() {
     this.$store.dispatch("pci/loadPointClouds");
-  },
-  data() {
-    return {
-      items: [
-        1, 2, 3, 4, 5, 6, 7, 2, 3, 4, 5, 6, 7, 2, 3, 4, 5, 6, 7, 2, 3, 4, 5, 6,
-        7, 2, 3, 4, 5, 6, 7, 2, 3, 4, 5, 6, 7, 2, 3, 4, 5, 6, 7, 2, 3, 4, 5, 6,
-        7, 2, 3, 4, 5, 6, 7, 2, 3, 4, 5, 6, 7, 2, 3, 4, 5, 6, 7, 2, 3, 4, 5, 6,
-        7, 2, 3, 4, 5, 6, 7, 2, 3, 4, 5, 6, 7, 2, 3, 4, 5, 6,
-      ],
-    };
   },
   computed: {
     cloudItems() {
@@ -105,7 +92,7 @@ button {
 .map-grid-container {
   display: grid;
   grid-template-areas: "main right";
-  grid-template-columns: calc(100vw - 300px) 300px;
+  grid-template-columns: calc(100vw - 325px) 325px;
   height: calc(
     100vh - 2em - 20px - 1px
   ); /*viewport height - height of navbar-button - padding - borderline*/
