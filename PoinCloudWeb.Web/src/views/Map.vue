@@ -2,12 +2,8 @@
   <div class="map-grid-container">
     <div id="map-settings">
       <div class="map-settings-internal">
-        <h3>Scans</h3>
-        <ul>
-          <!-- each scan in [{id:123, name: "Test"}, {id:558, name: "Test 55"}]
-						li
-							+scan(scan) -->
-        </ul>
+        <h3>Point Clouds</h3>
+
         <ul v-for="item in cloudItems" :key="item">
           <li><ScanItem :item="item" /></li>
         </ul>

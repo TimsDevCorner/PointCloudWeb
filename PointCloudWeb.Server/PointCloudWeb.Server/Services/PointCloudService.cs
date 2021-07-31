@@ -13,15 +13,21 @@ namespace PointCloudWeb.Server.Services
         {
             pointClouds = new PointCloudCollection();
             //this.pointCloudRegistation = pointCloudRegistation;
-            InitSamleData();
+            InitSampleData();
         }
 
-        private void InitSamleData()
+        private void InitSampleData()
         {
             pointClouds.Add(new PointCloud(Guid.NewGuid(), "Scan 1"));
             pointClouds.Add(new PointCloud(Guid.NewGuid(), "Scan 2"));
             pointClouds.Add(new PointCloud(Guid.NewGuid(), "Scan 3"));
             pointClouds.Add(new PointCloud(Guid.NewGuid(), "Scan 4"));
+            pointClouds.Add(new PointCloud(Guid.NewGuid(), "Scan 5"));
+            pointClouds.Add(new PointCloud(Guid.NewGuid(), "Scan 6"));
+            pointClouds.Add(new PointCloud(Guid.NewGuid(), "Scan 7"));
+            pointClouds.Add(new PointCloud(Guid.NewGuid(), "Scan 8"));
+            pointClouds.Add(new PointCloud(Guid.NewGuid(), "Scan 9"));
+            pointClouds.Add(new PointCloud(Guid.NewGuid(), "Scan 10"));
         }
 
         private void RaiseIfNotExists(Guid id)
