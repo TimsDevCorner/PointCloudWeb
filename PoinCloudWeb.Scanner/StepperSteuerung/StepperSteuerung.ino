@@ -1,18 +1,18 @@
-#include <AFMotor.h>
+#include <CheapStepper.h>
 
 double degreeY = 0;
 String rxData = ""; //Empfangen
 
-// Connect a stepper motor with 200 steps per revolution (1.8 degree)
-// to motor port #1 (M1 and M2)
-AF_Stepper motor(200, 1);
+CheapStepper stepper (8,9,10,11);
 
 void setup() {
   Serial.begin(9600); // opens serial port, sets data rate to 9600 bps
-  motor.setSpeed(60);  // 60 rpm 
+  stepper.setRpm(24);
 }
 
 void loop() {
+
+  stepper.run();
   // send data only when you receive data:
   if (Serial.available() > 0) {
     // read the incoming byte:
@@ -37,23 +37,27 @@ void loop() {
 }
 
 String moveMotor(double y){
+
+  
   if(y < degreeY){
-    motor.step((int)calculateStepps(degreeY - y), BACKWARD, INTERLEAVE); //"interleave" means that it alternates between single and double to get twice the resolution (but of course its half the speed)
-    motor.release();  // Strom sparen und Überhitzung des Controllers vorbeugen!
+    stepper.newMoveDegrees (true, calculateMove(y)); //true = im Uhrzeigersinn drehen
+    //motor.step((int)calculateStepps(degreeY - y), BACKWARD, INTERLEAVE); //"interleave" means that it alternates between single and double to get twice the resolution (but of course its half the speed)
+    //motor.release();  // Strom sparen und Überhitzung des Controllers vorbeugen!
   }
   else{
-    motor.step((int)calculateStepps(y - degreeY), FORWARD, INTERLEAVE);
-    motor.release();
+    stepper.newMoveDegrees (false, calculateMove(y)); //false = gegen Uhrzeigersinn drehen
+    //motor.step((int)calculateStepps(y - degreeY), FORWARD, INTERLEAVE);
+    //motor.release();
   }
   degreeY = y;
   return "<move><" + (String)y + ">";
 }
 
-double calculateStepps(double y){
+double calculateMove(double y){
   double temp = 0;
   if(y < degreeY)
     temp = degreeY - y;
   else
     temp = y - degreeY;
-  return (y / 1.8) * 2; // *2 wegen interleave stepps / Falls Untersetzung, multiplikator anpassen!
+  return temp * 7.37 ;// Übersetzung 96/11 4,4/30,5
 }
