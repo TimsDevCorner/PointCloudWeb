@@ -11,9 +11,8 @@ library.add(faEdit, faEye, faEyeSlash, faTrash, faTimes)
 
 //Vue.config.productionTip = false
 
-const app = createApp(App)
+createApp(App)
     .use(router)
     .use(store)
-    .component('font-awesome-icon', FontAwesomeIcon);
-
-app.mount('#app')
+    .component('font-awesome-icon', FontAwesomeIcon)
+    .mount('#app');

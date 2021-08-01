@@ -4,3 +4,4 @@ obj/
 .vscode/
 node_modules/
 *.csproj.user
+.idea

@@ -39,7 +39,7 @@ export default {
 }
 
 ul {
-  padding-left: 0px;
+  padding-left: 0;
 }
 
 li {
@@ -49,29 +49,15 @@ li {
 
 p {
   display: inline-block;
-  margin: 0px;
-  margin-left: 10px;
+  margin: 0 0 0 10px;
 }
 
 h3 {
-  margin: 0px;
+  margin: 0;
 }
 
 a {
   text-decoration: none;
-}
-
-button {
-  display: inline-block;
-  border-top: 0px;
-  border-bottom: 0px;
-  border-left: 0px;
-  border-right: 0px;
-
-  background: none;
-  cursor: pointer;
-  color: grey;
-  font-size: inherit;
 }
 
 #map-settings {
@@ -96,7 +82,7 @@ button {
   height: calc(
     100vh - 2em - 20px - 1px
   ); /*viewport height - height of navbar-button - padding - borderline*/
-  grid-gap: 0px;
-  padding: 0px;
+  grid-gap: 0;
+  padding: 0;
 }
 </style>

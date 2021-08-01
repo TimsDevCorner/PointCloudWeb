@@ -14,16 +14,16 @@
 
           <button class="button-delete" @click="onClickDelete()">
             <font-awesome-icon class="icon" icon="trash"></font-awesome-icon>
-            <p class="button-text">Delete</p>
+            <span class="button-text">Delete</span>
           </button>
 
           <button @click="onClickSave()">
             <font-awesome-icon class="icon" icon="edit"></font-awesome-icon>
-            <p class="button-text">Save</p>
+            <span class="button-text">Save</span>
           </button>
           <button @click="onClickEdit()">
             <font-awesome-icon class="icon" icon="times"></font-awesome-icon>
-            <p class="button-text">Cancel</p>
+            <span class="button-text">Cancel</span>
           </button>
         </div>
       </div>
@@ -54,7 +54,7 @@ export default {
       this.isCollapsed = !this.isCollapsed;
 
       if (this.isCollapsed) {
-        this.$refs.settings.style.height = 0;
+        this.$refs.settings.style.height = "0";
       } else {
         this.editPcName = this.item.name;
         this.$refs.settings.style.height =
@@ -76,11 +76,11 @@ export default {
       });
     },
     outerHeight(el) {
-      var width = el.offsetHeight;
+      let height = el.offsetHeight;
       const style = getComputedStyle(el);
 
-      width += parseInt(style.marginTop) + parseInt(style.marginTop);
-      return width;
+      height += parseInt(style.marginTop) + parseInt(style.marginTop);
+      return height;
     },
   },
   computed: {
@@ -100,8 +100,7 @@ export default {
 
 .caption {
   display: inline-block;
-  margin: 0px;
-  margin-left: 5px;
+  margin: 0 0 0 5px;
   font-size: 0.8em;
   cursor: pointer;
   user-select: none;
@@ -114,14 +113,10 @@ export default {
 
 .button-text {
   display: inline-block;
-  margin: 0px;
+  margin: 0;
 }
 
 #settings {
-  -moz-transition: height 0.1s;
-  -ms-transition: height 0.1s;
-  -o-transition: height 0.1s;
-  -webkit-transition: height 0.1s;
   transition: height 0.1s;
   height: 0;
   overflow: hidden;
