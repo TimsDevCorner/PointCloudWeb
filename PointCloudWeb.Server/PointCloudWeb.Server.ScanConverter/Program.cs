@@ -12,38 +12,48 @@ namespace PointCloudWeb.Server.ScanConverter
     {
         private static void Main()
         {
-            var scanPoints = File.ReadAllLines("C:\\Users\\timwu\\Desktop\\Scans\\0yGrad-edited-scan.csv")
+            var scanPoints = File.ReadAllLines("C:/Users/timwu/Desktop/Scans/0yGrad-scan-org.csv")
                                .Select(v => ScanDataPointFromCsv(v))
                                .Where(scan => scan.DistanceMM > 0)
                                .ToList();
 
             var result = new List<Point>();
-            var converter = new ScanConverterService();
 
             foreach (var scan in scanPoints)
             {
-                result.Add(converter.Transform(scan));
+                result.Add(ScanConverterService.Transform(scan));
                 //Console.WriteLine(result.Count + "::  " + scan.ToString() + " => " + result[result.Count - 1].ToString());
             }
 
             result.RemoveAll(point => point.X == 0 && point.Y == 0 & point.Z == 0);
 
-            string csv = String.Join("\n", result.Select(point => point.X + ", " + point.Y + ", " + point.Z).ToArray());
+            var csv = "x,y,z\n" + string.Join("\n", result.Select(point => point.X + ", " + point.Y + ", " + point.Z).ToArray());
 
-            File.WriteAllText("C:\\Users\\timwu\\Desktop\\Scans\\0yGrad-pc.csv", csv);
+            File.WriteAllText("C:\\Users\\timwu\\Desktop\\Scans\\0yGrad-pc-org.csv", csv);
 
             Console.WriteLine("Convert finished");
-            Console.ReadLine();
+            // Console.ReadLine();
         }
 
         private static ScanDataPoint ScanDataPointFromCsv(string csvLine)
         {
             string[] values = csvLine.Split(',');
-            return new ScanDataPoint(
+            var scan = new ScanDataPoint(
                 ray: Convert.ToDouble(values[0], CultureInfo.InvariantCulture),
                 rax: Convert.ToDouble(values[1], CultureInfo.InvariantCulture),
-                distanceMM: Convert.ToInt32(values[2], CultureInfo.InvariantCulture)
+                distanceMM: (int)Convert.ToDouble(values[2], CultureInfo.InvariantCulture)
                 );
+            
+            //scan.RAX += 90;
+            // scan.RAY += 90;
+            
+            //scan.RAX %= 360;
+            // scan.RAY %= 360;
+            
+            return scan;
+            if (scan.RAX == 1) return scan;
+            
+            return new ScanDataPoint();
         }
     }
 }

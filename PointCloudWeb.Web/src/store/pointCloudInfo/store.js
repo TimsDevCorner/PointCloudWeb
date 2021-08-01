@@ -49,10 +49,10 @@ export default {
             axios
                 .put(globals.API_URL + 'pointcloudinfo', pointCloudInfo)
                 .then(response => {
-                    setTimeout(() => {
+                     setTimeout(() => {
                         commit('UPDATE_PC', { action: "update", data: response.data });
                         commit('SET_LOADING', false);
-                    }, 80)();
+                    }, 80);
                 }).catch(() => {
                     commit('SET_LOADING', false)
                 })

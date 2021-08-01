@@ -7,12 +7,10 @@ namespace PointCloudWeb.Server.Services
     public class ScanDataService
     {
         private readonly PointCloudService _pointCloudService;
-        private readonly ScanConverterService _scanConverterService;
 
-        public ScanDataService(PointCloudService pointCloudService, ScanConverterService scanConverterService)
+        public ScanDataService(PointCloudService pointCloudService)
         {
             _pointCloudService = pointCloudService;
-            _scanConverterService = scanConverterService;
         }
 
         private IList<Point> ConvertToPoints(ScanDataList scanData)
@@ -21,7 +19,7 @@ namespace PointCloudWeb.Server.Services
 
             foreach (var scan in scanData.ScanPoints)
             {
-                list.Add(_scanConverterService.Transform(scan));
+                list.Add(ScanConverterService.Transform(scan));
             }
 
             return list;
