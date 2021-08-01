@@ -10,7 +10,7 @@ namespace PointCloudWeb.Server.ScanConverter
 {
     internal class Program
     {
-        private static void Main(string[] args)
+        private static void Main()
         {
             var scanPoints = File.ReadAllLines("C:\\Users\\timwu\\Desktop\\Scans\\0yGrad-edited-scan.csv")
                                .Select(v => ScanDataPointFromCsv(v))

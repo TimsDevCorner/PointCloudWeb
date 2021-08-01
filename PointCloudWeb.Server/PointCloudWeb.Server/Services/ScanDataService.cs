@@ -6,13 +6,13 @@ namespace PointCloudWeb.Server.Services
 {
     public class ScanDataService
     {
-        private readonly PointCloudService pointCloudService;
-        private readonly ScanConverterService scanConverterService;
+        private readonly PointCloudService _pointCloudService;
+        private readonly ScanConverterService _scanConverterService;
 
         public ScanDataService(PointCloudService pointCloudService, ScanConverterService scanConverterService)
         {
-            this.pointCloudService = pointCloudService;
-            this.scanConverterService = scanConverterService;
+            _pointCloudService = pointCloudService;
+            _scanConverterService = scanConverterService;
         }
 
         private IList<Point> ConvertToPoints(ScanDataList scanData)
@@ -21,7 +21,7 @@ namespace PointCloudWeb.Server.Services
 
             foreach (var scan in scanData.ScanPoints)
             {
-                list.Add(scanConverterService.Transform(scan));
+                list.Add(_scanConverterService.Transform(scan));
             }
 
             return list;
@@ -29,12 +29,12 @@ namespace PointCloudWeb.Server.Services
 
         public void AddScan(ScanDataList scanData)
         {
-            pointCloudService.AddPoints(scanData.Id, ConvertToPoints(scanData));
+            _pointCloudService.AddPoints(scanData.Id, ConvertToPoints(scanData));
         }
 
         public void ScanFinished(Guid id)
         {
-            pointCloudService.RegisterPointCloud(id);
+            _pointCloudService.RegisterPointCloud(id);
         }
     }
 }

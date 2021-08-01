@@ -11,8 +11,8 @@ namespace PointCloudWeb.Server.Services
             if (scan.RAX >= 180 || scan.RAY >= 180)
                 return new Point(0, 0, 0);
 
-            var degreeXA = scan.RAX;
-            var degreeYA = scan.RAY;
+            var degreeXa = scan.RAX;
+            var degreeYa = scan.RAY;
 
             //if (degreeXA > 270 && degreeYA > 270)
             //{
@@ -21,23 +21,23 @@ namespace PointCloudWeb.Server.Services
             //    factorZ = -1;
             //}
 
-            var degreeXB = 180 - 90 - degreeXA;
-            var degreeYB = 180 - 90 - degreeYA;
+            var degreeXb = 180 - 90 - degreeXa;
+            var degreeYb = 180 - 90 - degreeYa;
 
-            var radXA = degreeXA * Math.PI / 180;
-            var radXB = degreeXB * Math.PI / 180;
-            var radYA = degreeYA * Math.PI / 180;
-            var radYB = degreeYB * Math.PI / 180;
+            var radXa = degreeXa * Math.PI / 180;
+            var radXb = degreeXb * Math.PI / 180;
+            var radYa = degreeYa * Math.PI / 180;
+            var radYb = degreeYb * Math.PI / 180;
 
-            double sinXA = Math.Sin(radXA);
-            double sinXB = Math.Sin(radXB);
-            double sinYA = Math.Sin(radYA);
-            double sinYB = Math.Sin(radYB);
+            var sinXa = Math.Sin(radXa);
+            var sinXb = Math.Sin(radXb);
+            var sinYa = Math.Sin(radYa);
+            var sinYb = Math.Sin(radYb);
 
             var z = Math.Sqrt(
                 Math.Pow(
-                    Math.Pow(sinXB, 2) / Math.Pow(sinXA, 2)
-                    + Math.Pow(sinYB, 2) / Math.Pow(sinYA, 2)
+                    Math.Pow(sinXb, 2) / Math.Pow(sinXa, 2)
+                    + Math.Pow(sinYb, 2) / Math.Pow(sinYa, 2)
                     + 1
                     , -1)
                 * Math.Pow(scan.DistanceMM, 2)
@@ -45,8 +45,8 @@ namespace PointCloudWeb.Server.Services
 
             var p = new Point()
             {
-                X = NumericUtils.Round(z * sinYB / sinYA),
-                Y = NumericUtils.Round(z * sinXB / sinXA),
+                X = NumericUtils.Round(z * sinYb / sinYa),
+                Y = NumericUtils.Round(z * sinXb / sinXa),
                 Z = NumericUtils.Round(z)
             };
 
