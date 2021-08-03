@@ -11,17 +11,17 @@ namespace PointCloudWeb.Server.Services
             // if (scan.RAX >= 90 || scan.RAY >= 90)
             //     return new Point(0, 0, 0);
 
-            var degreeXa = scan.RAX;
+            var degreeXa = (scan.RAX) % 360;
             var degreeYa = scan.RAY;
 
             var factorY = 1;
             var factorZ = 1;
             if (180 <= degreeXa && degreeXa <= 360)
             {
-                 factorY = -1;
-                 factorZ = -1;
+                factorY = -1;
+                factorZ = -1;
             }
-                 
+
             var degreeXb = 180 - 90 - degreeXa;
             var degreeYb = 180 - 90 - degreeYa;
 
@@ -40,6 +40,7 @@ namespace PointCloudWeb.Server.Services
                 sinXa = 1;
                 sinXb = 0;
             }
+
             if (sinYa == 0)
             {
                 sinYa = 1;
@@ -53,13 +54,25 @@ namespace PointCloudWeb.Server.Services
                     + 1
                     , -1)
                 * Math.Pow(scan.DistanceMM, 2)
-                );
+            );
 
-            var p = new Point()
+            var p = new Point
             {
                 X = NumericUtils.Round(z * sinYb / sinYa),
                 Y = factorY * NumericUtils.Round(z * sinXb / sinXa),
                 Z = factorZ * NumericUtils.Round(z)
+            };
+            return p;
+
+            //https://stackoverflow.com/questions/52781607/3d-point-from-two-angles-and-a-distance
+            var pitch = radYa;
+            var yaw = radXa;
+
+            p = new Point
+            {
+                X = (int) (scan.DistanceMM * Math.Sin(yaw) * Math.Cos(pitch)),
+                Y = (int) (scan.DistanceMM * Math.Sin(pitch)),
+                Z = (int) (scan.DistanceMM * Math.Cos(yaw) * Math.Cos(pitch))
             };
 
             return p;

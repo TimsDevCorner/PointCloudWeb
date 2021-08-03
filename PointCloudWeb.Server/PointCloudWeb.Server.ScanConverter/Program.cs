@@ -12,7 +12,7 @@ namespace PointCloudWeb.Server.ScanConverter
     {
         private static void Main()
         {
-            var scanPoints = File.ReadAllLines("C:/Users/timwu/Desktop/Scans/0yGrad-scan-org.csv")
+            var scanPoints = File.ReadAllLines("C:/Users/timwu/Desktop/Scans/Esszimmer-scan.csv")
                                .Select(v => ScanDataPointFromCsv(v))
                                .Where(scan => scan.DistanceMM > 0)
                                .ToList();
@@ -29,7 +29,7 @@ namespace PointCloudWeb.Server.ScanConverter
 
             var csv = "x,y,z\n" + string.Join("\n", result.Select(point => point.X + ", " + point.Y + ", " + point.Z).ToArray());
 
-            File.WriteAllText("C:\\Users\\timwu\\Desktop\\Scans\\0yGrad-pc-org.csv", csv);
+            File.WriteAllText("C:\\Users\\timwu\\Desktop\\Scans\\Esszimmer-pc.csv", csv);
 
             Console.WriteLine("Convert finished");
             // Console.ReadLine();
@@ -44,11 +44,8 @@ namespace PointCloudWeb.Server.ScanConverter
                 distanceMM: (int)Convert.ToDouble(values[2], CultureInfo.InvariantCulture)
                 );
             
-            //scan.RAX += 90;
-            // scan.RAY += 90;
-            
-            //scan.RAX %= 360;
-            // scan.RAY %= 360;
+            //scan.RAX = (scan.RAX + 90) % 360;
+            //scan.RAY = (scan.RAY + 90) % 360;
             
             return scan;
             if (scan.RAX == 1) return scan;
