@@ -9,8 +9,8 @@
         </ul>
       </div>
     </div>
-    <div id="map" class="content-padding">
-      <h1>Place the Point Cloud visualization here</h1>
+    <div id="map" >
+      <iframe src="Potree/examples/multiple_pointclouds.html"></iframe>
     </div>
   </div>
 </template>
@@ -31,11 +31,15 @@ export default {
 </script>
 
 <style scoped>
+
+iframe {
+  width: 100%;
+  height: Calc(100% - 5px);
+  border: 0;
+}
+
 .map-grid-container {
   text-align: left;
-}
-.content-padding {
-  padding: 10px;
 }
 
 ul {
