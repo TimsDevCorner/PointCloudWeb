@@ -64,7 +64,7 @@ namespace PointCloudWeb.Server.Tests.Services
             var expected = new Point(x, y, z);
 
             var service = new ScanConverterService();
-            var point = service.Transform(scan);
+            var point = ScanConverterService.Transform(scan);
             Assert.Equal(expected, point);
         }
     }

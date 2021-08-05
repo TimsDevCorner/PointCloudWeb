@@ -6,48 +6,73 @@ namespace PointCloudWeb.Server.Services
 {
     public class ScanConverterService
     {
-        public Point Transform(ScanDataPoint scan)
+        public static Point Transform(ScanDataPoint scan)
         {
-            if (scan.RAX >= 180 || scan.RAY >= 180)
-                return new Point(0, 0, 0);
+            // if (scan.RAX >= 90 || scan.RAY >= 90)
+            //     return new Point(0, 0, 0);
 
-            var degreeXA = scan.RAX;
-            var degreeYA = scan.RAY;
+            var degreeXa = (scan.RAX) % 360;
+            var degreeYa = scan.RAY;
 
-            //if (degreeXA > 270 && degreeYA > 270)
-            //{
-            //    degreeXA -= 270;
-            //    degreeYA -= 270;
-            //    factorZ = -1;
-            //}
+            var factorY = 1;
+            var factorZ = 1;
+            if (180 <= degreeXa && degreeXa <= 360)
+            {
+                factorY = -1;
+                factorZ = -1;
+            }
 
-            var degreeXB = 180 - 90 - degreeXA;
-            var degreeYB = 180 - 90 - degreeYA;
+            var degreeXb = 180 - 90 - degreeXa;
+            var degreeYb = 180 - 90 - degreeYa;
 
-            var radXA = degreeXA * Math.PI / 180;
-            var radXB = degreeXB * Math.PI / 180;
-            var radYA = degreeYA * Math.PI / 180;
-            var radYB = degreeYB * Math.PI / 180;
+            var radXa = degreeXa * Math.PI / 180;
+            var radXb = degreeXb * Math.PI / 180;
+            var radYa = degreeYa * Math.PI / 180;
+            var radYb = degreeYb * Math.PI / 180;
 
-            double sinXA = Math.Sin(radXA);
-            double sinXB = Math.Sin(radXB);
-            double sinYA = Math.Sin(radYA);
-            double sinYB = Math.Sin(radYB);
+            var sinXa = Math.Sin(radXa);
+            var sinXb = Math.Sin(radXb);
+            var sinYa = Math.Sin(radYa);
+            var sinYb = Math.Sin(radYb);
+
+            if (sinXa == 0)
+            {
+                sinXa = 1;
+                sinXb = 0;
+            }
+
+            if (sinYa == 0)
+            {
+                sinYa = 1;
+                sinYb = 0;
+            }
 
             var z = Math.Sqrt(
                 Math.Pow(
-                    Math.Pow(sinXB, 2) / Math.Pow(sinXA, 2)
-                    + Math.Pow(sinYB, 2) / Math.Pow(sinYA, 2)
+                    Math.Pow(sinXb, 2) / Math.Pow(sinXa, 2)
+                    + Math.Pow(sinYb, 2) / Math.Pow(sinYa, 2)
                     + 1
                     , -1)
                 * Math.Pow(scan.DistanceMM, 2)
-                );
+            );
 
-            var p = new Point()
+            var p = new Point
             {
-                X = NumericUtils.Round(z * sinYB / sinYA),
-                Y = NumericUtils.Round(z * sinXB / sinXA),
-                Z = NumericUtils.Round(z)
+                X = NumericUtils.Round(z * sinYb / sinYa),
+                Y = factorY * NumericUtils.Round(z * sinXb / sinXa),
+                Z = factorZ * NumericUtils.Round(z)
+            };
+            return p;
+
+            //https://stackoverflow.com/questions/52781607/3d-point-from-two-angles-and-a-distance
+            var pitch = radYa;
+            var yaw = radXa;
+
+            p = new Point
+            {
+                X = (int) (scan.DistanceMM * Math.Sin(yaw) * Math.Cos(pitch)),
+                Y = (int) (scan.DistanceMM * Math.Sin(pitch)),
+                Z = (int) (scan.DistanceMM * Math.Cos(yaw) * Math.Cos(pitch))
             };
 
             return p;

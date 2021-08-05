@@ -9,23 +9,23 @@ namespace PointCloudWeb.Server.Controllers
     [Route("[controller]")]
     public class DataController : ControllerBase
     {
-        private readonly ScanDataService scanDataService;
+        private readonly ScanDataService _scanDataService;
 
         public DataController(ScanDataService scanDataService)
         {
-            this.scanDataService = scanDataService;
+            this._scanDataService = scanDataService;
         }
 
         [HttpPost]
         public void PostScanData([FromBody] ScanDataList data)
         {
-            scanDataService.AddScan(data);
+            _scanDataService.AddScan(data);
         }
 
         [HttpPut]
         public void ScanFinished(Guid id)
         {
-            scanDataService.ScanFinished(id);
+            _scanDataService.ScanFinished(id);
         }
     }
 }

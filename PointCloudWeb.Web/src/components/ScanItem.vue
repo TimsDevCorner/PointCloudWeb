@@ -1,7 +1,7 @@
 <template>
   <div>
     <font-awesome-icon class="icon" :icon="iconName" @click="onClickVisible" />
-    <p @click="onClickEdit()">{{ item.name }}</p>
+    <p class="caption" @click="onClickEdit()">{{ item.name }}</p>
     <div id="settings" ref="settings" class="collapsed">
       <div id="settings-container" ref="settings-container">
         <div>
@@ -12,23 +12,25 @@
             @keyup.enter="onEnter()"
           />
 
+          <button class="button-delete" @click="onClickDelete()">
+            <font-awesome-icon class="icon" icon="trash"></font-awesome-icon>
+            <span class="button-text">Delete</span>
+          </button>
+
           <button @click="onClickSave()">
             <font-awesome-icon class="icon" icon="edit"></font-awesome-icon>
-            <p>Save</p>
+            <span class="button-text">Save</span>
           </button>
           <button @click="onClickEdit()">
             <font-awesome-icon class="icon" icon="times"></font-awesome-icon>
-            <p>Cancel</p>
-          </button>
-          <button @click="onClickDelete()">
-            <font-awesome-icon class="icon" icon="trash"></font-awesome-icon>
-            <p>Delete</p>
+            <span class="button-text">Cancel</span>
           </button>
         </div>
       </div>
     </div>
   </div>
 </template>
+
 
 <script>
 export default {
@@ -52,7 +54,7 @@ export default {
       this.isCollapsed = !this.isCollapsed;
 
       if (this.isCollapsed) {
-        this.$refs.settings.style.height = 0;
+        this.$refs.settings.style.height = "0";
       } else {
         this.editPcName = this.item.name;
         this.$refs.settings.style.height =
@@ -74,11 +76,11 @@ export default {
       });
     },
     outerHeight(el) {
-      var width = el.offsetHeight;
+      let height = el.offsetHeight;
       const style = getComputedStyle(el);
 
-      width += parseInt(style.marginTop) + parseInt(style.marginTop);
-      return width;
+      height += parseInt(style.marginTop) + parseInt(style.marginTop);
+      return height;
     },
   },
   computed: {
@@ -96,20 +98,25 @@ export default {
   cursor: pointer;
 }
 
-p {
+.caption {
   display: inline-block;
-  margin: 0px;
-  margin-left: 5px;
+  margin: 0 0 0 5px;
   font-size: 0.8em;
   cursor: pointer;
   user-select: none;
 }
 
+.button-delete {
+  display: inline-block;
+  margin-left: 10px;
+}
+
+.button-text {
+  display: inline-block;
+  margin: 0;
+}
+
 #settings {
-  -moz-transition: height 0.1s;
-  -ms-transition: height 0.1s;
-  -o-transition: height 0.1s;
-  -webkit-transition: height 0.1s;
   transition: height 0.1s;
   height: 0;
   overflow: hidden;
@@ -125,4 +132,4 @@ p {
   border-width: 1px;
   border-color: grey;
 }
-</style>e
+</style>

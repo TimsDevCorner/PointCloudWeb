@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
-using System.Linq;
+using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
 
 namespace PointCloudWeb.Server.Models
@@ -27,29 +27,27 @@ namespace PointCloudWeb.Server.Models
 
         public override bool Equals(object obj)
         {
-            if ((obj == null) || !GetType().Equals(obj.GetType()))
+            if (obj == null || GetType() != obj.GetType())
                 return false;
-            else
-            {
-                Point p = (Point)obj;
-                return (X == p.X) && (Y == p.Y) && (Z == p.Z);
-            }
+            var p = (Point) obj;
+            return X == p.X && Y == p.Y && Z == p.Z;
         }
 
+        [SuppressMessage("ReSharper", "NonReadonlyMemberInGetHashCode")]
         public override int GetHashCode() => HashCode.Combine(X, Y, Z);
 
-        public override string ToString() => X.ToString() + "  " + Y.ToString() + "  " + Z.ToString();
+        public override string ToString() => X + "  " + Y + "  " + Z;
     }
 
     public class PointCloud
     {
-        private ObservableCollection<Point> points;
-        private Matrix4x4 transformation;
+        private readonly ObservableCollection<Point> _points;
+        private Matrix4x4 _transformation;
 
         public PointCloud(Guid id, string name)
         {
-            points = new ObservableCollection<Point>();
-            points.CollectionChanged += PointsCollectionChanged;
+            _points = new ObservableCollection<Point>();
+            _points.CollectionChanged += PointsCollectionChanged;
             TransformedPoints = new List<Point>();
             Id = id;
             Name = name;
@@ -59,15 +57,18 @@ namespace PointCloudWeb.Server.Models
 
         public string Name { get; set; }
 
-        public IList<Point> Points { get => points; }
+        public IList<Point> Points
+        {
+            get => _points;
+        }
 
         public Matrix4x4 Transformation
         {
-            get => transformation;
+            get => _transformation;
             set
             {
                 TransformationChanged();
-                transformation = value;
+                _transformation = value;
             }
         }
 
