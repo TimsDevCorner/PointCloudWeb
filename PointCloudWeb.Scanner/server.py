@@ -2,11 +2,16 @@
 import serial
 import time
 import PyLidar3
+import asyncio
+import websockets
 
-arduino = serial.Serial(port='COM8', baudrate=9600)
-lidar = PyLidar3.YdLidarX4(port='COM6',chunk_size=20000) #PyLidar3.your_version_of_lidar(port,chunk_size) 
+#arduino = serial.Serial(port='COM5', baudrate=9600)
+#lidar = PyLidar3.YdLidarX4(port='COM6',chunk_size=20000) #PyLidar3.your_version_of_lidar(port,chunk_size) 
 
-f = open("PoinCloudWeb.Scanner\datafile.txt","wt")
+f = open("PointCloudWeb.Scanner\datafile.txt","wt")
+f.write("y, x, z\n")
+
+progress = 0
 
 print("Start ...")
 time.sleep(2)
@@ -35,7 +40,7 @@ def filterY(data):
 
 def senddata(data,posy):
     for x,y  in data.items():
-        f.write("y:" + str(posy) + "x:" + str(x) + "d:" + str(y) + "\n")
+        f.write(str(posy) + ", " + str(x) + ", " + str(y) + "\n")
 
 def startScaner(mode):
     if(lidar.Connect()):
@@ -68,21 +73,53 @@ def startScaner(mode):
             setY(0)
 
         else:
-            print("Mode Error")
+            print("mode error")
 
-        # data = next(gen)
-        # #print(data)
-        # for x,y  in data.items():
-        #     f.write("a:" + str(x) + " d:" + str(y) + "\n")
         f.close()
         lidar.StopScanning()
         lidar.Disconnect()
-        print("Scaner gestoppt")
+        print("scan stoped")
     else:
         print("Error connecting to device")
 
-while True:
-    startScaner(input("Scan Modus(0,1,2):"))
+async def wsfilter(websocket, message):
+    command = message[message.find("<")+1:message.find(">")]
+    value = message[message.find("><")+2:message.find(">", message.find("><")+2)]
+    #print(command + " / " + value)
+    await wsaction(websocket, command,value)
+
+async def wsaction(websocket, command, value):
+    if(command == "start"):
+        if(value == "0"):
+            await websocket.send("start scan resolution 0")
+        elif(value =="1"):
+            await websocket.send("start scan resolution 1")
+        elif(value =="2"):
+            await websocket.send("start scan resolution 2")
+        else:
+            await websocket.send("mode error")
+    elif(command == "status"):
+        await websocket.send("Status ...")
+    else:
+        await websocket.send("command error")
+        #muss noch was passieren
+
+async def wscom(websocket, path):
+    print("connected")
+    while True:
+       data = await websocket.recv()
+       await wsfilter(websocket, data)
+       print({data})
+       #await websocket.send(data)
+
+async def main():
+    server = await websockets.serve(wscom, 'localhost', 6789)
+    await server.wait_closed()
+asyncio.run(main())
+
+#while True:
+#    startScaner(input("Scan Modus(0,1,2):"))
+    #wsfilter(input("Befehlt Eingeben:"))
     # for x in range(18):
     #     setY(x*10)
     #     time.sleep(1)
