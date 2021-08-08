@@ -3,8 +3,11 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using System.IO;
 using System.Numerics;
+using System.Text;
 
 namespace PointCloudWeb.Server.Models
 {
@@ -29,7 +32,7 @@ namespace PointCloudWeb.Server.Models
         {
             if (obj == null || GetType() != obj.GetType())
                 return false;
-            var p = (Point) obj;
+            var p = (Point)obj;
             return X == p.X && Y == p.Y && Z == p.Z;
         }
 
@@ -57,18 +60,16 @@ namespace PointCloudWeb.Server.Models
 
         public string Name { get; set; }
 
-        public IList<Point> Points
-        {
-            get => _points;
-        }
+        public IList<Point> Points => _points;
 
+        // ReSharper disable once MemberCanBePrivate.Global
         public Matrix4x4 Transformation
         {
             get => _transformation;
             set
             {
-                TransformationChanged();
                 _transformation = value;
+                TransformationChanged();
             }
         }
 
@@ -91,7 +92,7 @@ namespace PointCloudWeb.Server.Models
                 TransformationChanged();
         }
 
-        public void TransformationChanged()
+        private void TransformationChanged()
         {
             TransformedPoints.Clear();
 
@@ -103,6 +104,37 @@ namespace PointCloudWeb.Server.Models
                 var transformedPoint = GetTransformedPoint(point);
                 TransformedPoints.Add(transformedPoint);
             }
+        }
+
+        // ReSharper disable once MemberCanBePrivate.Global
+        public string ToStringXyz()
+        {
+            var stringBuilder = new StringBuilder();
+            foreach (var point in _points)
+            {
+                stringBuilder.AppendLine(string.Join(',', point.X, point.Y, point.Z));
+            }
+
+            return stringBuilder.ToString();
+        }
+
+        // ReSharper disable once MemberCanBePrivate.Global
+        public void WriteToXyz(string fileName)
+        {
+            File.WriteAllText(fileName, ToStringXyz());
+        }
+
+        public void WriteToLas(string fileName)
+        {
+            var fileNameXyz = Path.ChangeExtension(fileName, ".xyz");
+            WriteToXyz(fileNameXyz);
+
+            var cloudCompare = new Process();
+            cloudCompare.StartInfo.FileName = Globals.CloudCompareExe;
+            cloudCompare.StartInfo.Arguments =
+                $"-SILENT -O \"{fileNameXyz}\" -C_EXPORT_FMT las -SAVE_CLOUDS FILE \"{fileName}\"";
+            cloudCompare.Start();
+            cloudCompare.WaitForExit();
         }
     }
 

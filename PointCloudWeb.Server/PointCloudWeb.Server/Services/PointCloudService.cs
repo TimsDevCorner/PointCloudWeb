@@ -1,64 +1,48 @@
 using System;
 using System.Collections.Generic;
-using System.Globalization;
+using System.Diagnostics;
 using System.IO;
 using PointCloudWeb.Server.Models;
+using PointCloudWeb.Server.Utils;
 
 namespace PointCloudWeb.Server.Services
-{   
+{
     public class PointCloudService
     {
         //private readonly IPointCloudRegistrationService pointCloudRegistration;
         private readonly PointCloudCollection _pointClouds;
 
-        public PointCloudService(/*IPointCloudRegistrationService pointCloudRegistration*/)
+        public PointCloudService( /*IPointCloudRegistrationService pointCloudRegistration*/)
         {
             _pointClouds = new PointCloudCollection();
             //this.pointCloudRegistration = pointCloudRegistration;
             InitSampleData();
         }
 
-        private static int TextToCoordinate(string text)
+        private void GeneratePotreeData(Guid id)
         {
-            var dDecimal = Convert.ToDecimal(text, CultureInfo.InvariantCulture);
-            dDecimal *= 100_000_000; //convert decimal points to integer points
-            return (int)dDecimal;
-        } 
-        
-        private static void LoadPointCloudFromEthFile(PointCloud target, string path)
-        {
-            var lines = File.ReadLines(path );
-            foreach (var line in lines)
-            {
-                //skip header
-                if (line.Contains("x,y,z")) 
-                    continue;
+            var pathTarget = Globals.PotreeDataPath;
+            var converter = Globals.PotreeConverterExe;
 
-                var values = line.Split(',');
+            var tempFile = Globals.TempPath + $"/{id}.las";
 
-                var point = new Point(
-                    TextToCoordinate(values[1]),
-                    TextToCoordinate(values[2]),
-                    TextToCoordinate(values[3])
-                    );
-                target.Points.Add(point);
-            }
+            Directory.CreateDirectory(Globals.TempPath);
+
+            var pc = _pointClouds.GetById(id);
+
+            pc.WriteToLas(tempFile);
+            
+            
+            var potreeConverter = new Process();
+            potreeConverter.StartInfo.FileName = Globals.PotreeConverterExe;
+            potreeConverter.StartInfo.Arguments = $"\"{tempFile}\" -o \"{Globals.TempPath}/{id.ToString()}\"";
+            potreeConverter.Start();
+            potreeConverter.WaitForExit();
         }
 
-        private void ConvertPointsToPotree()
-        {
-            var path = Globals.PotreeDataPath;
-        }
-        
         private void InitSampleData()
         {
-            var pc = new PointCloud(Guid.NewGuid(), "Scan 1");
-            LoadPointCloudFromEthFile(pc, "ETH-Data/Hokuyo_0.csv");
-            _pointClouds.Add(pc);
-            
-            pc = new PointCloud(Guid.NewGuid(), "Scan 2");
-            LoadPointCloudFromEthFile(pc, "ETH-Data/Hokuyo_1.csv");
-            _pointClouds.Add(pc);
+            EthTestData.CreateData(this);
         }
 
         private void RaiseIfNotExists(Guid id)
@@ -77,15 +61,16 @@ namespace PointCloudWeb.Server.Services
                 pc.Points.Add(point);
         }
 
-        public IList<PointCloud> GetAll()
+        public PointCloud AddPointCloud()
         {
-            return _pointClouds;
+            var pc = new PointCloud(Guid.NewGuid(), "");
+            _pointClouds.Add(pc);
+            return pc;
         }
 
-        public PointCloud GetById(Guid id)
-        {
-            return _pointClouds.GetById(id);
-        }
+        public IEnumerable<PointCloud> GetAll() => _pointClouds;
+
+        public PointCloud GetById(Guid id) =>  _pointClouds.GetById(id);
 
         public void RegisterPointCloud(Guid id)
         {
@@ -109,6 +94,12 @@ namespace PointCloudWeb.Server.Services
         public void RemoveById(Guid id)
         {
             _pointClouds.RemoveById(id);
+        }
+
+        public void PointCloudCompleted(Guid id)
+        {
+            RegisterPointCloud(id);
+            GeneratePotreeData(id);
         }
     }
 }

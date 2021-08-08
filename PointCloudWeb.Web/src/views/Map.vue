@@ -10,7 +10,7 @@
       </div>
     </div>
     <div id="map" >
-      <iframe src="Potree/examples/multiple_pointclouds.html"></iframe>
+      <iframe src="Potree/examples/pcw.html"></iframe>
     </div>
   </div>
 </template>

@@ -32,7 +32,7 @@ namespace PointCloudWeb.Server.Services
 
         public void ScanFinished(Guid id)
         {
-            _pointCloudService.RegisterPointCloud(id);
+            _pointCloudService.PointCloudCompleted(id);
         }
     }
 }

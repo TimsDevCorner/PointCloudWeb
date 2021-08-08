@@ -1,3 +1,4 @@
+using System.IO;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -12,6 +13,7 @@ namespace PointCloudWeb.Server
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
+            Directory.Delete(Globals.TempPath, true); 
         }
 
         public IConfiguration Configuration { get; }
