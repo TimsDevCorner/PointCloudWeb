@@ -1,18 +1,27 @@
 <template>
-  <div>
+  <div class="ui">
     <h1>Welcome to PointCloudWeb</h1>
-    <div class="scanresolution">
-      <button v-on:click="sendMessage('<start><0>')" >Start Scan: low</button>
-      <button v-on:click="sendMessage('<start><1>')" >Start Scan: medium</button>
-      <button v-on:click="sendMessage('<start><2>')" >Start Scan: high</button>
-      <button v-on:click="sendMessage('Connect')" >Connect</button>
+    <div v-if="connection_status && !scan_status">
+      <button class="button" v-on:click="sendMessage('<start><0>')" >Start Scan: low</button>
+      <button class="button button2" v-on:click="sendMessage('<start><1>')" >Start Scan: medium</button>
+      <button class="button button3" v-on:click="sendMessage('<start><2>')" >Start Scan: high</button>
     </div>
-    <div class="scanresolution">
-      <h1>status: {{status}}</h1>
-      <div class="value" v-for="(item, index) in logs" :key="item.id">
-          {{logs[index]}}
-      </div>
+    <div class="progressbar" v-if="connection_status">
+      <div :style="{width: progress + '%'}"></div>
     </div>
+    <p v-if="connection_status">{{progress}} %</p>
+    <div>
+      <h1 v-if="!connection_status">status: disconnected</h1>
+      <h1 v-if="connection_status">status: connected</h1>
+      <button  v-if="!connection_status" v-on:click="connectWS" >Connect</button>
+      <ul>
+        <div class="value" v-for="(item, index) in logs" :key="item.id">
+            <li>{{logs[index]}}</li>
+        </div>
+      </ul>
+    </div>
+      <!--<button v-on:click="connection_status = !connection_status" >test</button>-->
+      <button v-on:click="logs = []" >clear logs</button>
   </div>
 </template>
 
@@ -20,34 +29,119 @@
 export default {
   data() {
     return {
+      wsConnection: null,
       logs: [],
-      status: "disconnected"
+      connection_status: false,
+      scan_status: false,
+      progress: 0,
+      command: "",
+      value: ""
     };
   },
   methods: {
-    sendMessage: function(message) {
+    sendMessage(message) {
+      this.wsConnection.send(message);
+    },
+    connectWS(){
+      this.wsConnection = new WebSocket("ws://127.0.0.1:6789/")
+      let that = this
+      
+      this.wsConnection.onopen = function(){
+        that.connection_status = true
+      }
 
-      this.connection.send(message);
+      this.wsConnection.onmessage = function(event){
+        if(event.data)
+        that.msgFilter(event.data)
+      }
+    },
+    msgFilter(message){
+      let that = this
+      if(message.search("<") != -1){
+        that.command = message.substr(message.search("<")+1, message.search(">")-1)
+        that.value = message.substr(message.search(">")+1)
+        console.log("command: " + that.command + " / value: " + that.value)
+        this.action(that.command, that.value)
+      }
+      else{
+        that.command = "log"
+        that.value = message
+        this.action(that.command, that.value)
+      }
+    },
+    action(command, value){
+      let that = this
+      if(command == "progress"){
+        that.progress = parseInt(value, 10)
+      }
+      else if(command == "log"){
+        that.logs.push(value);
+      }
+      else if(command == "scan"){
+        if(value == "running")
+          that.scan_status = true
+        else
+          that.scan_status = false
+      }
+      else
+        that.logs.push("Unknow command: " + value);
+
     }
   },
-  created: function() {
-    this.connection = new WebSocket("ws://127.0.0.1:6789/")
-    let that = this
-
-    this.connection.onopen = function(){
-      that.status = "connected"
-      that.logs.push("successfully connected to scanserver")
-    }
-
-    this.connection.onmessage = function(event){
-      console.log(event)
-      that.logs.push(event.data);
-    }
-
+  created() {
+    this.connectWS();
   }
 };
 </script>
 
 <style scoped>
+
+.ui {
+  width: 600px;
+  margin: auto;
+}
+
+ul {
+  overflow: scroll;
+  background: lightgray;
+  height: 200px;
+}
+
+li {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+
+.progressbar {
+  background-color: grey;
+  border-radius: 7px;
+  /* (height of inner div) / 2 + padding */
+  padding: 3px;
+  margin: auto;
+}
+
+.progressbar>div {
+  background-color: greenyellow;
+  /* Adjust with JavaScript */
+  height: 20px;
+  border-radius: 4px;
+}
+
+.button {
+  background-color: #4CAF50; /* Green */
+  border: none;
+  color: white;
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin: 4px 2px;
+  cursor: pointer;
+}
+
+.button2 {background-color: #008CBA;} /* Blue */
+.button3 {background-color: #f44336;} /* Red */ 
 
 </style>
