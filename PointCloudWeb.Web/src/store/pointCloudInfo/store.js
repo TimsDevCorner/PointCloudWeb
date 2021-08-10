@@ -8,12 +8,11 @@ export default {
         pointClouds: [],
         loading: false
     },
-    // getters: {
-    //     pointClouds: state => state.pointClouds,
-    //     loading: state => state.loading
-    // },    
     mutations: {
         SET_POINT_CLOUDS(state, pointClouds) {
+            for (const i in pointClouds) {
+                pointClouds[i].visible = true;
+            }
             state.pointClouds = pointClouds
         },
         SET_LOADING(state, loading) {
@@ -25,11 +24,16 @@ export default {
                 return;
 
             if (pointCloud.action === "update") {
+                pointCloud.data.visible = true;
                 state.pointClouds[index] = pointCloud.data;
             }
             else if (pointCloud.action === "remove") {
                 state.pointClouds.splice(index, 1);
             }
+        },
+        SET_VISIBLE(state, visibleInfo){
+            let pc = state.pointClouds.find(x => x.id === visibleInfo.id);
+            pc.visible = visibleInfo.visible;
         },
     },
     actions: {
@@ -68,6 +72,9 @@ export default {
                     alert(e);
                     commit('SET_LOADING', false);
                 })
+        },
+        updateVisible({ commit }, visibleInfo) {
+            commit('SET_VISIBLE', visibleInfo);
         }
     }
 }

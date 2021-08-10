@@ -13,7 +13,13 @@ namespace PointCloudWeb.Server
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
-            Directory.Delete(Globals.TempPath, true); 
+
+            if (Directory.Exists(Globals.TempPath))
+                Directory.Delete(Globals.TempPath, true);
+            if (Directory.Exists(Globals.PotreeDataPath))
+                Directory.Delete(Globals.PotreeDataPath, true);
+            Directory.CreateDirectory(Globals.TempPath);
+            Directory.CreateDirectory(Globals.PotreeDataPath);
         }
 
         public IConfiguration Configuration { get; }
@@ -36,10 +42,7 @@ namespace PointCloudWeb.Server
 
             //app.UseAuthorization();
 
-            app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapControllers();
-            });
+            app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
         }
 
         // This method gets called by the runtime. Use this method to add services to the container.

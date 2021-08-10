@@ -7,7 +7,7 @@ namespace PointCloudWeb.Server
         static Globals()
         {
             var basePath = Directory.GetCurrentDirectory() + "/../..";
-            PotreeDataPath = basePath + "/PointCloudWeb.Web/public/Potree/pointclouds";
+            PotreeDataPath = basePath + "/PointCloudWeb.Web/public/Potree/pointclouds/generated";
             PotreeConverterExe = basePath + "/PointCloudWeb.Server/Tools/PotreeConverter/PotreeConverter.exe";
             TempPath = basePath + "/temp";
             CloudCompareExe = "C:/Program Files/CloudCompare/CloudCompare.exe";

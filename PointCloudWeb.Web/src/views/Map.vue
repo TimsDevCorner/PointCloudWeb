@@ -5,17 +5,20 @@
         <h3>Point Clouds</h3>
 
         <ul v-for="item in cloudItems" :key="item">
-          <li><ScanItem :item="item" /></li>
+          <li>
+            <ScanItem :item="item"/>
+          </li>
         </ul>
       </div>
     </div>
-    <div id="map" >
-      <iframe src="Potree/examples/pcw.html"></iframe>
+    <div id="map">
+      <PotreeViewer/>
     </div>
   </div>
 </template>
 <script>
 import ScanItem from "@/components/ScanItem";
+import PotreeViewer from "@/components/PotreeViewer";
 
 export default {
   created() {
@@ -26,18 +29,17 @@ export default {
       return this.$store.state.pci.pointClouds;
     },
   },
-  components: { ScanItem },
+  components: {PotreeViewer, ScanItem},
 };
 </script>
 
 <style scoped>
 
-iframe {
+PotreeViewer {
   width: 100%;
-  height: Calc(100% - 5px);
+  height: 100%;
   border: 0;
 }
-
 .map-grid-container {
   text-align: left;
 }
@@ -70,6 +72,7 @@ a {
   height: 100%;
   overflow-y: auto;
 }
+
 .map-settings-internal {
   padding: 20px;
 }
@@ -84,7 +87,7 @@ a {
   grid-template-areas: "main right";
   grid-template-columns: calc(100vw - 325px) 325px;
   height: calc(
-    100vh - 2em - 20px - 1px
+      100vh - 2em - 20px - 1px
   ); /*viewport height - height of navbar-button - padding - borderline*/
   grid-gap: 0;
   padding: 0;

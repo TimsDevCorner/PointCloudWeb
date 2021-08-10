@@ -19,7 +19,6 @@
 <script src="../libs/spectrum/spectrum.js"></script>
 <script src="../libs/jquery-ui/jquery-ui.min.js"></script>
 
-
 <script src="../libs/other/BinaryHeap.js"></script>
 <script src="../libs/tween/tween.min.js"></script>
 <script src="../libs/d3/d3.js"></script>
@@ -33,16 +32,12 @@
 <!-- INCLUDE ADDITIONAL DEPENDENCIES HERE -->
 <!-- INCLUDE SETTINGS HERE -->
 
-<div class="potree_container" style="position: absolute; width: 100%; height: 100%; left: 0px; top: 0px; ">
-    <div id="potree_render_area"
-         style="background-image: url('../build/potree/resources/images/background.jpg');"></div>
+<div class="potree_container" style="position: absolute; width: 100%; height: 100%; left: 0; top: 0; ">
     <div id="potree_sidebar_container"></div>
+    <div id="potree_render_area"></div>
 </div>
 
-<script type="module">
-
-    import * as THREE from "../libs/three.js/build/three.module.js";
-
+<script>
     window.viewer = new Potree.Viewer(document.getElementById("potree_render_area"));
 
     viewer.setEDLEnabled(true);
@@ -51,107 +46,61 @@
     viewer.setMinNodeSize(10);
     viewer.loadSettingsFromURL();
 
-    viewer.setDescription(`Sorvilier point cloud courtesy of <a target='_blank' href='https://www.sigeom.ch/'>sigeom sa</a>`);
-
     viewer.loadGUI(() => {
         viewer.setLanguage('en');
         $("#menu_scene").next().show();
         $("#menu_tools").next().show();
-        viewer.toggleSidebar();
+        // viewer.toggleSidebar();
     });
 
 
-    // wrap load code into an async function so that we can use "await"
-    async function load() {
+    let loadedPointClouds = [];
 
-        // specify point clouds that are to be loaded and callbacks to invoke
-        let pointclouds = [
-            {
-                url: "../pointclouds/test.las_converted/metadata.json",
-                callback: (pointcloud) => {
-                    pointcloud.name = "sorvilier";
+    async function loadByPc(pointCloud) {
+        let doLoadPc = Potree.loadPointCloud("../pointclouds/generated/" + pointCloud.id + "/metadata.json");
 
-                    let material = pointcloud.material;
-                    material.size = 1;
-                    material.pointSizeType = Potree.PointSizeType.ADAPTIVE;
-                },
-            }
-            // , {
-            //     url: "../pointclouds/lion_takanawa/cloud.js",
-            //     callback: (pointcloud) => {
-            //         pointcloud.name = "lion 1";
-            //
-            //         let material = pointcloud.material;
-            //         material.pointSizeType = Potree.PointSizeType.ADAPTIVE;
-            //
-            //         pointcloud.position.set(589927.44, 231479.04, 726.87);
-            //         pointcloud.scale.set(10, 10, 10);
-            //         pointcloud.rotation.set(0, 0, 0.8 * Math.PI);
-            //     },
-            // }, {
-            //     url: "../pointclouds/lion_takanawa/cloud.js",
-            //     callback: (pointcloud) => {
-            //         pointcloud.name = "lion 2";
-            //
-            //         let material = pointcloud.material;
-            //
-            //         material.size = 1;
-            //         material.pointSizeType = Potree.PointSizeType.ADAPTIVE;
-            //         material.activeAttributeName = "elevation";
-            //         material.heightMin = 720;
-            //         material.heightMax = 780;
-            //
-            //         pointcloud.position.set(589997.44, 231479.04, 726.87);
-            //         pointcloud.scale.set(10, 10, 10);
-            //         pointcloud.rotation.set(0, 0, 0.8 * Math.PI);
-            //     },
-            // }, {
-            //     url: "../pointclouds/lion_takanawa/cloud.js",
-            //     callback: (pointcloud) => {
-            //         pointcloud.name = "lion 3";
-            //
-            //         let material = pointcloud.material;
-            //         material.pointSizeType = Potree.PointSizeType.ADAPTIVE;
-            //
-            //         material.color = new THREE.Color().setRGB(0.4, 0.6, 0.7);
-            //
-            //         pointcloud.position.set(589927.44 - 70, 231479.04, 726.87);
-            //         pointcloud.scale.set(10, 10, 10);
-            //         pointcloud.rotation.set(0, 0, 0.8 * Math.PI);
-            //     },
-            // }, {
-            //     url: "http://5.9.65.151/mschuetz/potree/resources/pointclouds/archpro/heidentor/cloud.js",
-            //     callback: (pointcloud) => {
-            //         pointcloud.name = "Heidentor";
-            //
-            //         pointcloud.position.set(589817.920, 231358.010, 744.865);
-            //         pointcloud.scale.set(6, 6, 6);
-            //         pointcloud.rotation.z = -1.9;
-            //     },
-            // }
-        ];
-
-        // start loading all point clouds asynchronously, get a promise for each one that resolves when it's loaded
-        let promises = pointclouds.map(p => Potree.loadPointCloud(p.url));
-
-        // now iterate over all promises in order
-        for (let i = 0; i < promises.length; i++) {
-
-            // wait until this point cloud is loaded before processing the next one
-            let pointcloud = (await promises[i]).pointcloud;
-
-            viewer.scene.addPointCloud(pointcloud);
-            pointclouds[i].callback(pointcloud);
-        }
+        let pc = (await doLoadPc).pointcloud;
 
 
-        viewer.scene.view.setView(
-            [589974.341, 231698.397, 986.146],
-            [589851.587, 231428.213, 715.634],
-        );
+        pc.name = pointCloud.name;//(' ' + pointCloud.name).slice(1);
+
+        viewer.scene.addPointCloud(pc);
+
+        // let material = pc.material;
+        // material.size = 1;
+        // material.pointSizeType = Potree.PointSizeType.ADAPTIVE;
+
+        loadedPointClouds.push({id: pointCloud.id, pointCloud: pc})
     }
 
-    load();
+    window.loadFromArray = function (pointClouds) {
+        for (const i in pointClouds) {
+            let entry = loadedPointClouds.find(pc => pc.id === pointClouds[i].id)
+            if (entry != null) {
+                entry.pointCloud.name = pointClouds[i].name;
+                if (entry.pointCloud.visible !== pointClouds[i].visible)
+                    entry.pointCloud.visible = pointClouds[i].visible;
+                else {
+                    entry.pointCloud.visible = !entry.pointCloud.visible;
+                    entry.pointCloud.visible = !entry.pointCloud.visible;
+                }
+            } else {
+                loadByPc(pointClouds[i])
+            }
+        }
+        let notFound = [...loadedPointClouds.filter(pc => pointClouds.find(ipc => ipc.id === pc.id) === null)];
+        for (let entry in notFound) {
+            // entry.pointCloud
+            //TODO: Remove from Potree
+        }
+    }
+
+    window.setVisible = function (targetId, val) {
+        let entry = loadedPointClouds.find(pc => pc.id === targetId)
+        entry.visible = val;
+    }
+
+
 </script>
 
 

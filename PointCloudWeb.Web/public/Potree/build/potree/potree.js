@@ -79571,8 +79571,9 @@ ENDSEC
 				let node = createNode(pcID, pointcloud.name, cloudIcon, pointcloud);
 
 				pointcloud.addEventListener("visibility_changed", () => {
+                    tree.jstree('rename_node', node, pointcloud.name);
 					if(pointcloud.visible){
-						tree.jstree('check_node', node);
+                        tree.jstree('check_node', node);
 					}else {
 						tree.jstree('uncheck_node', node);
 					}

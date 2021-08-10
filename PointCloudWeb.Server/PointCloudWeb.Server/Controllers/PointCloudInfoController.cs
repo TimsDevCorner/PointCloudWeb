@@ -14,7 +14,7 @@ namespace PointCloudWeb.Server.Controllers
 
         public PointCloudInfoController(PointCloudService pointCloudService)
         {
-            this._pointCloudService = pointCloudService;
+            _pointCloudService = pointCloudService;
         }
 
         private PointCloudInfoDto ConvertPointCloudToDto(PointCloud pc) => new PointCloudInfoDto(pc.Id, pc.Name);
@@ -47,7 +47,8 @@ namespace PointCloudWeb.Server.Controllers
                 return new NotFoundResult();
 
             _pointCloudService.RemoveById(id);
-            return new OkResult();
+            //Json Result, becaus OkResult throws in Firefox an XML-Root element not found error.
+            return new JsonResult("OK");
         }
 
         [HttpPut]

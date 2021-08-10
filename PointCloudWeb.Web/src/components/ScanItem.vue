@@ -46,6 +46,10 @@ export default {
   methods: {
     onClickVisible() {
       this.isVisible = !this.isVisible;
+      this.$store.dispatch("pci/updateVisible", {
+        id: this.item.id,
+        visible: this.isVisible,
+      });
     },
     onEnter() {
       this.onClickSave();

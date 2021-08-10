@@ -21,23 +21,19 @@ namespace PointCloudWeb.Server.Services
 
         private void GeneratePotreeData(Guid id)
         {
-            var pathTarget = Globals.PotreeDataPath;
-            var converter = Globals.PotreeConverterExe;
-
+            var pathTarget = Globals.PotreeDataPath + $"/{id.ToString()}";
             var tempFile = Globals.TempPath + $"/{id}.las";
-
-            Directory.CreateDirectory(Globals.TempPath);
-
+            
             var pc = _pointClouds.GetById(id);
-
             pc.WriteToLas(tempFile);
-            
-            
+
             var potreeConverter = new Process();
             potreeConverter.StartInfo.FileName = Globals.PotreeConverterExe;
             potreeConverter.StartInfo.Arguments = $"\"{tempFile}\" -o \"{Globals.TempPath}/{id.ToString()}\"";
             potreeConverter.Start();
             potreeConverter.WaitForExit();
+
+            Directory.Move(Globals.TempPath + "/" + id, pathTarget);
         }
 
         private void InitSampleData()
@@ -70,7 +66,7 @@ namespace PointCloudWeb.Server.Services
 
         public IEnumerable<PointCloud> GetAll() => _pointClouds;
 
-        public PointCloud GetById(Guid id) =>  _pointClouds.GetById(id);
+        public PointCloud GetById(Guid id) => _pointClouds.GetById(id);
 
         public void RegisterPointCloud(Guid id)
         {
