@@ -88,10 +88,25 @@
                 loadByPc(pointClouds[i])
             }
         }
-        let notFound = [...loadedPointClouds.filter(pc => pointClouds.find(ipc => ipc.id === pc.id) === null)];
-        for (let entry in notFound) {
-            // entry.pointCloud
-            //TODO: Remove from Potree
+
+        for (let entry in loadedPointClouds) {
+            if (pointClouds.find(ipc => ipc.id === loadedPointClouds[entry].id))
+                continue;
+
+            const index = viewer.scene.pointclouds.indexOf(loadedPointClouds[entry].pointCloud);
+            if (index > -1) {
+                window.viewer.scene.pointclouds.forEach(function (layer) {
+                    if (layer === loadedPointClouds[entry].pointCloud)
+                        window.viewer.scene.scenePointCloud.remove(layer);
+                });
+                viewer.scene.pointclouds.splice(index, 1);
+
+                loadedPointClouds[entry].pointCloud.dispatchEvent({
+                    type: "remove"
+                });
+
+                loadedPointClouds.splice(entry, 1);
+            }
         }
     }
 

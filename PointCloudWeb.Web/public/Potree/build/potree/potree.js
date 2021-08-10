@@ -79578,6 +79578,10 @@ ENDSEC
 						tree.jstree('uncheck_node', node);
 					}
 				});
+                pointcloud.addEventListener("remove", () => {
+                    const nodeObj = tree.jstree(true).get_node(node);
+                    tree.jstree(true).delete_node(nodeObj);
+                });
 			};
 
 			let onMeasurementAdded = (e) => {
