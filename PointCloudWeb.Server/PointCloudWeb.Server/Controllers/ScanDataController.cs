@@ -7,22 +7,23 @@ namespace PointCloudWeb.Server.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class DataController : ControllerBase
+    public class ScanDataController : ControllerBase
     {
         private readonly ScanDataService _scanDataService;
 
-        public DataController(ScanDataService scanDataService)
+        public ScanDataController(ScanDataService scanDataService)
         {
-            this._scanDataService = scanDataService;
-        }
-
-        [HttpPost]
-        public void PostScanData([FromBody] ScanDataList data)
-        {
-            _scanDataService.AddScan(data);
+            _scanDataService = scanDataService;
         }
 
         [HttpPut]
+        public void SendScanData([FromBody] ScanDataList data)
+        {
+            _scanDataService.AddScanData(data);
+        }
+
+        [HttpPut]
+        [Route("finished/{id:Guid}")]
         public void ScanFinished(Guid id)
         {
             _scanDataService.ScanFinished(id);

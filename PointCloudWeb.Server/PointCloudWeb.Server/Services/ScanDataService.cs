@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using PointCloudWeb.Server.Models;
 
 namespace PointCloudWeb.Server.Services
@@ -13,26 +14,13 @@ namespace PointCloudWeb.Server.Services
             _pointCloudService = pointCloudService;
         }
 
-        private IList<Point> ConvertToPoints(ScanDataList scanData)
-        {
-            var list = new List<Point>();
+        private static IEnumerable<Point> ConvertToPoints(ScanDataList scanData)
+            => scanData.ScanPoints.Select(ScanConverterService.Transform).ToList();
 
-            foreach (var scan in scanData.ScanPoints)
-            {
-                list.Add(ScanConverterService.Transform(scan));
-            }
-
-            return list;
-        }
-
-        public void AddScan(ScanDataList scanData)
-        {
-            _pointCloudService.AddPoints(scanData.Id, ConvertToPoints(scanData));
-        }
+        public void AddScanData(ScanDataList scanData)
+            => _pointCloudService.AddPoints(scanData.Id, ConvertToPoints(scanData));
 
         public void ScanFinished(Guid id)
-        {
-            _pointCloudService.PointCloudCompleted(id);
-        }
+            => _pointCloudService.PointCloudCompleted(id);
     }
 }

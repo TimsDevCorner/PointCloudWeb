@@ -62,17 +62,17 @@ namespace PointCloudWeb.Server.Services
                 Y = factorY * NumericUtils.Round(z * sinXb / sinXa),
                 Z = factorZ * NumericUtils.Round(z)
             };
-            return p;
+            //return p;
 
             //https://stackoverflow.com/questions/52781607/3d-point-from-two-angles-and-a-distance
-            var pitch = radYa;
-            var yaw = radXa;
+            var beta = radYa;
+            var alpha = radXa;
 
             p = new Point
             {
-                X = (int) (scan.DistanceMM * Math.Sin(yaw) * Math.Cos(pitch)),
-                Y = (int) (scan.DistanceMM * Math.Sin(pitch)),
-                Z = (int) (scan.DistanceMM * Math.Cos(yaw) * Math.Cos(pitch))
+                Y = (int)(scan.DistanceMM * Math.Sin(alpha)),
+                X = (int)(scan.DistanceMM * Math.Cos(beta) * Math.Cos(alpha)),
+                Z = (int)(scan.DistanceMM * Math.Sin(beta) * Math.Cos(alpha))
             };
 
             return p;

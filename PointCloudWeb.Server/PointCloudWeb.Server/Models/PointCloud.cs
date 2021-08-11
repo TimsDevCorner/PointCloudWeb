@@ -5,6 +5,7 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.IO;
 using System.Numerics;
 using System.Text;
@@ -112,7 +113,13 @@ namespace PointCloudWeb.Server.Models
             var stringBuilder = new StringBuilder();
             foreach (var point in _points)
             {
-                stringBuilder.AppendLine(string.Join(',', point.X, point.Y, point.Z));
+                // + 0.001 Otherwise points are outside of the bounding box by a floating-error, then Potree-Converter fails
+                stringBuilder.AppendLine(string.Join(',', 
+                    (point.X + 0.001).ToString(CultureInfo.InvariantCulture), 
+                    (point.Y + 0.001).ToString(CultureInfo.InvariantCulture), 
+                    (point.Z + 0.001).ToString(CultureInfo.InvariantCulture)
+                    )
+                );
             }
 
             return stringBuilder.ToString();
@@ -148,14 +155,14 @@ namespace PointCloudWeb.Server.Models
             return pc;
         }
 
-        public bool Contains(Guid id)
+        public bool Contains(Guid? id)
         {
             return GetById(id) != null;
         }
 
-        public PointCloud GetById(Guid id)
+        public PointCloud GetById(Guid? id)
         {
-            return Find(pc => pc.Id == id);
+            return id == null ? null : Find(pc => pc.Id == id);
         }
 
         public void RemoveById(Guid id)

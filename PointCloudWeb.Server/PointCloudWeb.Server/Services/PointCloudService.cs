@@ -23,7 +23,7 @@ namespace PointCloudWeb.Server.Services
         {
             var pathTarget = Globals.PotreeDataPath + $"/{id.ToString()}";
             var tempFile = Globals.TempPath + $"/{id}.las";
-            
+
             var pc = _pointClouds.GetById(id);
             pc.WriteToLas(tempFile);
 
@@ -47,19 +47,24 @@ namespace PointCloudWeb.Server.Services
                 throw new ArgumentOutOfRangeException($"The Id {id.ToString()} was not found!");
         }
 
-        public void AddPoints(Guid id, IList<Point> points)
+        public void AddPoints(Guid id, IEnumerable<Point> points)
         {
-            RaiseIfNotExists(id);
-
-            var pc = _pointClouds.GetById(id);
+            var pc = _pointClouds.GetById(id)
+                     ?? AddPointCloud(id);
 
             foreach (var point in points)
-                pc.Points.Add(point);
+            {
+                if (point.X != 0 || point.Y != 0 || point.Z != 0)
+                    pc.Points.Add(point);
+            }
         }
 
-        public PointCloud AddPointCloud()
+        public PointCloud AddPointCloud(Guid? id = null)
         {
-            var pc = new PointCloud(Guid.NewGuid(), "");
+            if (id != null && _pointClouds.Contains(id))
+                throw new ArgumentOutOfRangeException($"Add of existing id \"{id}\" not possible!");
+
+            var pc = new PointCloud(id ?? Guid.NewGuid(), $"Scan #{_pointClouds.Count + 1}");
             _pointClouds.Add(pc);
             return pc;
         }
