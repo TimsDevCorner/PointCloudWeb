@@ -4,10 +4,12 @@ import time
 import PyLidar3
 import asyncio
 import websockets
-from concurrent.futures import ThreadPoolExecutor
+import threading
+import collections
+import requests
 
-f = open("PointCloudWeb.Scanner\datafile.txt","wt")
-f.write("y, x, z\n")
+# f = open("PointCloudWeb.Scanner\datafile.txt","wt")
+# f.write("y, x, z\n")
 
 arduino_status = False
 arduino_port = "COM9"
@@ -18,30 +20,34 @@ lidar_port = "COM6"
 lidar_chunk_size = 20000
 lidar = None
 scan_progress = 0
-_executor = ThreadPoolExecutor(1)
-newMessage = ""
-lastMessage = ""
+scan_running = False
+stop_scan = False
+ws_message_queue = collections.deque(maxlen=100) 
+scan_id = "32a3acd0-4d67-4281-bf9c-3eefc093eca4"
 
-async def init(websocket):
-    global arduino 
-    arduino = serial.Serial(port=arduino_port, baudrate=arduino_baud)
+async def init():
+    global arduino, ws_message_queue, arduino_status, lidar, lidar_status
     try:
-        await websocket.send("arduino connected " + arduino_port)
-        global arduino_status 
+        arduino = serial.Serial(port=arduino_port, baudrate=arduino_baud)
+        ws_message_queue.appendleft("arduino connected " + arduino_port)
         arduino_status = True
     except:
-        await websocket.send("can not connect to arduino! " + arduino_port)
+        ws_message_queue.appendleft("can not connect to arduino! " + arduino_port)
+        arduino_status = False
     try:
-        global lidar
         lidar = PyLidar3.YdLidarX4(port=lidar_port,chunk_size=lidar_chunk_size) #PyLidar3.your_version_of_lidar(port,chunk_size) 
         if(lidar.Connect()):
-            global lidar_status
             lidar_status = True
-            await websocket.send("lidar connected " + lidar_port)
+            ws_message_queue.appendleft("lidar connected " + lidar_port)
         else:
             raise ValueError
     except:
-        await websocket.send("can not connect to lidar! " + lidar_port)
+        ws_message_queue.appendleft("can not connect to lidar! " + lidar_port)
+        lidar_status = False
+    if( arduino_status == True and lidar_status == True):
+        ws_message_queue.appendleft("<connection>true")
+    else:
+        ws_message_queue.appendleft("<connection>false")
 
 def arduino_write_read(x):
     arduino.write(bytes(x, 'utf-8'))
@@ -50,130 +56,161 @@ def arduino_write_read(x):
 
 def setY(y):
     tmp = arduino_write_read("<set><"+str(y)+">")
-    print(tmp)
-
-# def getY():
-#     print(arduino_write_read("<get>"))
-
-# def resetY():
-#     print(arduino_write_read("<reset>"))
-
-# def zerotY():
-#     print(arduino_write_read("<zero>"))
 
 def filterY(data):
     temp = data[data.find("<"):data.find(">")]
     return temp + data[data.find("><"):data.find(">", data.find("><")+2)+1]
 
 def senddata(data,posy):
+    temp ="{\"Id\": "+scan_id+",\"ScanPoints\":["
     for x,y  in data.items():
-         f.write(str(posy) + ", " + str(x) + ", " + str(y) + "\n")
+         temp += ("{\"RAY\":" + str(posy) + ",\"RAX\":" + str(x) + ",\"DistanceMM\":" + str(y) + "},")
+        #  f.write("{\"RAY\":" + str(posy) + ",\"RAX\":" + str(x) + ",\"DistanceMM\":" + str(y) + "},")
+    l = len(temp)
+    temp = temp[:l-1] + "]}"
+    r = requests.put(url='http://localhost:35588/scandata', data=temp, headers={'content-type': 'application/json'})
+    #print(r.status_code)
 
-def startScaner(websocket, mode):
-    global scan_progress 
-    global lidar
+
+def startScaner(mode):
+    global scan_progress, lidar, stop_scan, scan_id
     if lidar_status == True:
-        print(lidar.GetDeviceInfo())
+        ws_message_queue.appendleft(str(lidar.GetDeviceInfo()))
         gen = lidar.StartScanning()
         if mode == "0":
             print("Mode 0")
-            for y in range(18):
+            ws_message_queue.appendleft("<scan>running")
+            for y in range(19):
+                if(stop_scan == True):
+                    break
+                print("send data")
                 senddata(next(gen),y*10)
                 time.sleep(2)
                 setY( y*10)
                 time.sleep(2)
-                scan_progress = y/18*100
-                print(str(scan_progress) + " %")
+                scan_progress = round(y/18*100)
+                ws_message_queue.appendleft("<progress>" + str(scan_progress))
+            requests.put(url='http://localhost:35588/scandata', data='finished/'+scan_id, headers={'content-type': 'application/json'})
             setY(0)
             lidar.StopScanning()
-            lidar.Disconnect()
         elif mode == "1":
-            print("Mode 1")
-            for y in range(90):
+            ws_message_queue.appendleft("<scan>running")
+            for y in range(91):
+                if(stop_scan == True):
+                    break
                 senddata(next(gen),y*2)
                 time.sleep(1)
                 setY(y*2)
                 time.sleep(1)
-                scan_progress  = y/90*100
-                print(str(scan_progress) + " %")
+                scan_progress  = round(y/90*100)
+                ws_message_queue.appendleft("<progress>" + str(scan_progress))
+            requests.put(url='http://localhost:35588/scandata', data='finished/'+scan_id, headers={'content-type': 'application/json'})
             setY(0)
             lidar.StopScanning()
-            lidar.Disconnect()
         elif mode == "2":
-            print("Mode 2")
-            for y in range(360):
+            ws_message_queue.appendleft("<scan>running")
+            for y in range(361):
+                if(stop_scan == True):
+                    break
                 senddata(next(gen),y*0.5)
                 time.sleep(1)
                 setY(y*0.5)
                 time.sleep(1)
-                scan_progress  = y/360*100
-                print(str(scan_progress) + " %")
+                scan_progress  = round(y/360*100)
+                ws_message_queue.appendleft("<progress>" + str(scan_progress))
+            requests.put(url='http://localhost:35588/scandata', data='finished/'+scan_id, headers={'content-type': 'application/json'})
             setY(0)
             lidar.StopScanning()
-            lidar.Disconnect()
-        elif mode == "3":
-            print(scan_progress)
-            scan_progress += 1
-            print(scan_progress)
         else:
-            print("mode error")
-
-        f.close()
-        print("scan stoped")
+            ws_message_queue.appendleft("mode error")
+        #f.close()
+        if(stop_scan == True):
+            stop_scan = False
+            ws_message_queue.appendleft("<scan>canceld")
+            ws_message_queue.appendleft("scan canceld !")
+        else:
+            ws_message_queue.appendleft("<scan>finished")
+            ws_message_queue.appendleft("scan finished")
     else:
-        print("Error connecting to device")
+        ws_message_queue.appendleft("Error connecting to device")
 
-async def wsfilter(websocket, message):
+async def wsfilter(message):
     command = message[message.find("<")+1:message.find(">")]
     value = message[message.find("><")+2:message.find(">", message.find("><")+2)]
-    await wsaction(websocket, command,value)
+    await wsaction(command,value)
 
-async def wsaction(websocket, command, value):
+async def wsaction(command, value):
+    global ws_message_queue, stop_scan
     if command == "start":
         if value == "0":
-            await websocket.send("start scan resolution 0")
-            await loop.run_in_executor(_executor, startScaner(websocket, value))
+            ws_message_queue.appendleft("start scan on low resolution")
+            x = threading.Thread(target=startScaner, args=(value))
+            x.start()
         elif value =="1":
-            await websocket.send("start scan resolution 1")
-            await loop.run_in_executor(_executor, startScaner(websocket, value))
+            ws_message_queue.appendleft("start scan on medium resolution")
+            x = threading.Thread(target=startScaner, args=(value))
+            x.start()
         elif value =="2":
-            await websocket.send("start scan resolution 2")
-            await loop.run_in_executor(_executor, startScaner(websocket, value))
-        elif value =="3":
-            await websocket.send("start scan test")
-            await loop.run_in_executor(_executor, startScaner(websocket, value))
+            ws_message_queue.appendleft("start scan on high resolution")
+            x = threading.Thread(target=startScaner, args=(value))
+            x.start()
         else:
-            await websocket.send("mode error")
+            ws_message_queue.appendleft("mode error")
     elif command == "connect" and arduino  and lidar != None:
-        await websocket.send("try to connect to Adruino and LIDAR")
-        await init(websocket)
+        ws_message_queue.appendleft("try to connect to Adruino and LIDAR")
+        await init()
     elif command == "status":
-        await websocket.send("progress: " + scan_progress)
+        ws_message_queue.appendleft("progress: " + scan_progress)
+    elif command == "stop":
+        stop_scan = True
+    elif command == "init":
+        await init()
     else:
-        await websocket.send("command error")
+        ws_message_queue.appendleft("command error")
 
-async def wscom(websocket, path):
-    await websocket.send("Websocket connected")
-    await init(websocket)
+async def producer_handler(websocket, path):
     while True:
-        data2 = await websocket.recv()
-        await wsfilter(websocket, data2)
-        print({data2})
-        if scan_progress != lastMessage:
-            await websocket.send(scan_progress)
-            lastMessage = scan_progress
+        global ws_message_queue
+        if len(ws_message_queue) > 0:
+            message = ws_message_queue.pop()
+            print(message)
+            await websocket.send(message)
+        await asyncio.sleep(0.01)  
 
-async def main():
-    server = await websockets.serve(wscom, 'localhost', 6789)
-    await server.wait_closed()
+async def consumer_handler(websocket, path):
+    async for message in websocket:
+        await wsfilter(message)
+        
+async def handler(websocket, path):
+    print("Start Websocket Connection at ")
+    await init()
+    consumer_task = asyncio.ensure_future(consumer_handler(websocket, path))
+    producer_task = asyncio.ensure_future(producer_handler(websocket, path))
+    done, pending = await asyncio.wait([consumer_task, producer_task], return_when=asyncio.FIRST_COMPLETED)
+    for task in pending:
+        task.cancel()
 
-loop = asyncio.get_event_loop()
-loop.run_until_complete(main())
-#asyncio.run(main())
-
-#while True:
-#    startScaner(input("Scan Modus(0,1,2):"))
-    #wsfilter(input("Befehlt Eingeben:"))
-    # for x in range(18):
-    #     setY(x*10)
-    #     time.sleep(1)
+try:
+    ws_server = websockets.serve(handler, 'localhost', 6789)
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(ws_server)
+    loop.run_forever()
+finally:
+    print("shutting down server")
+    ws_message_queue.appendleft("shutting down server")
+    stop_scan = True
+    print("set stop_scan")
+    try:
+        setY(0)
+        print("reset stepper")
+    except:
+        print("can´t reset stepper")
+    ws_message_queue.appendleft("<connection>false")
+    print("Status an UI senden")
+    try:
+        lidar.Disconnect()
+        print("LIDAR Disconnecten")
+    except:
+        print("can´t disconnecten lidar")
+    loop.close()
+    print("server down")

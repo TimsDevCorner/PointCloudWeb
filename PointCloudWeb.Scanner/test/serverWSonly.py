@@ -4,7 +4,6 @@ import time
 import PyLidar3
 import asyncio
 import websockets
-from concurrent.futures import ThreadPoolExecutor
 import threading
 import collections
 
@@ -20,7 +19,8 @@ lidar_port = "COM6"
 lidar_chunk_size = 20000
 lidar = None
 scan_progress = 0
-messageQeue = ['test', 'test1', 'abc']
+scan_running = False
+stop_scan = False
 ws_message_queue = collections.deque(maxlen=100) 
 
 async def init():
@@ -40,6 +40,7 @@ async def init():
         ws_message_queue.appendleft("lidar connected " + lidar_port)
     except:
         ws_message_queue.appendleft("can not connect to lidar! " + lidar_port)
+    ws_message_queue.appendleft("<connection>true")
 
 def arduino_write_read(x):
     data1 = x
@@ -47,7 +48,6 @@ def arduino_write_read(x):
 
 def setY(y):
     tmp = arduino_write_read("<set><"+str(y)+">")
-    print(tmp)
 
 def filterY(data):
     temp = data[data.find("<"):data.find(">")]
@@ -58,12 +58,14 @@ def senddata(data,posy):
          f.write(str(posy) + ", " + str(x) + ", " + str(y) + "\n")
 
 def startScaner(mode):
-    global scan_progress, lidar, messageQeue
+    global scan_progress, lidar, stop_scan
     if lidar_status == True:
         ws_message_queue.appendleft("start scan mode: " + mode)
         if mode == "0":
             ws_message_queue.appendleft("<scan>running")
             for y in range(19):
+                if(stop_scan == True):
+                    break
                 time.sleep(0.2)
                 setY( y*10)
                 scan_progress = round(y/18*100)
@@ -72,14 +74,19 @@ def startScaner(mode):
         elif mode == "1":
             ws_message_queue.appendleft("<scan>running")
             for y in range(91):
+                if(stop_scan == True):
+                    break
                 time.sleep(0.2)
                 setY(y*2)
                 scan_progress  = round(y/90*100)
                 ws_message_queue.appendleft("<progress>" + str(scan_progress))
             setY(0)
+
         elif mode == "2":
             ws_message_queue.appendleft("<scan>running")
             for y in range(361):
+                if(stop_scan == True):
+                    break
                 time.sleep(0.1)
                 setY(y*0.5)
                 scan_progress  = round(y/360*100)
@@ -89,8 +96,13 @@ def startScaner(mode):
             ws_message_queue.appendleft("mode error")
 
         f.close()
-        ws_message_queue.appendleft("<scan>finished")
-        ws_message_queue.appendleft("scan finished")
+        if(stop_scan == True):
+            stop_scan = False
+            ws_message_queue.appendleft("<scan>canceld")
+            ws_message_queue.appendleft("scan canceld !")
+        else:
+            ws_message_queue.appendleft("<scan>finished")
+            ws_message_queue.appendleft("scan finished")
     else:
         ws_message_queue.appendleft("Error connecting to device")
 
@@ -100,7 +112,7 @@ async def wsfilter(message):
     await wsaction(command,value)
 
 async def wsaction(command, value):
-    global ws_message_queue
+    global ws_message_queue, stop_scan
     if command == "start":
         if value == "0":
             ws_message_queue.appendleft("start scan on low resolution")
@@ -121,6 +133,8 @@ async def wsaction(command, value):
         await init()
     elif command == "status":
         ws_message_queue.appendleft("progress: " + scan_progress)
+    elif command == "stop":
+        stop_scan = True
     else:
         ws_message_queue.appendleft("command error")
 
@@ -137,7 +151,7 @@ async def consumer_handler(websocket, path):
         await wsfilter(message)
         
 async def handler(websocket, path):
-    print("Start Websocket Connection")
+    print("Start Websocket Connection at ")
     await init()
     consumer_task = asyncio.ensure_future(consumer_handler(websocket, path))
     producer_task = asyncio.ensure_future(producer_handler(websocket, path))

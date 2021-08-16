@@ -115,9 +115,9 @@ namespace PointCloudWeb.Server.Models
             {
                 // + 0.001 Otherwise points are outside of the bounding box by a floating-error, then Potree-Converter fails
                 stringBuilder.AppendLine(string.Join(',', 
-                    (point.X + 0.001).ToString(CultureInfo.InvariantCulture), 
-                    (point.Y + 0.001).ToString(CultureInfo.InvariantCulture), 
-                    (point.Z + 0.001).ToString(CultureInfo.InvariantCulture)
+                    (point.X + 0.1).ToString(CultureInfo.InvariantCulture), 
+                    (point.Y + 0.1).ToString(CultureInfo.InvariantCulture), 
+                    (point.Z + 0.1).ToString(CultureInfo.InvariantCulture)
                     )
                 );
             }
