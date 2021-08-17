@@ -48,9 +48,6 @@ namespace PointCloudWeb.Server.ScanConverter
             //scan.RAY = (scan.RAY + 90) % 360;
             
             return scan;
-            if (scan.RAX == 1) return scan;
-            
-            return new ScanDataPoint();
         }
     }
 }

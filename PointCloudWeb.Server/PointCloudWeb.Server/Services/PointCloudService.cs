@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using PointCloudWeb.Server.Models;
-using PointCloudWeb.Server.Utils;
 
 namespace PointCloudWeb.Server.Services
 {
@@ -38,7 +37,7 @@ namespace PointCloudWeb.Server.Services
 
         private void InitSampleData()
         {
-            EthTestData.CreateData(this);
+            //EthTestData.CreateData(this);
         }
 
         private void RaiseIfNotExists(Guid id)
@@ -61,7 +60,7 @@ namespace PointCloudWeb.Server.Services
 
         public PointCloud AddPointCloud(Guid? id = null)
         {
-            if (id != null && _pointClouds.Contains(id))
+            if (_pointClouds.Contains(id))
                 throw new ArgumentOutOfRangeException($"Add of existing id \"{id}\" not possible!");
 
             var pc = new PointCloud(id ?? Guid.NewGuid(), $"Scan #{_pointClouds.Count + 1}");
