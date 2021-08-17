@@ -1,8 +1,5 @@
-using PointCloudWeb.Server.Utils;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
@@ -45,14 +42,9 @@ namespace PointCloudWeb.Server.Models
 
     public class PointCloud
     {
-        private readonly ObservableCollection<Point> _points;
-        private Matrix4x4 _transformation;
-
         public PointCloud(Guid id, string name)
         {
-            _points = new ObservableCollection<Point>();
-            _points.CollectionChanged += PointsCollectionChanged;
-            TransformedPoints = new List<Point>();
+            Points = new List<Point>();
             Id = id;
             Name = name;
         }
@@ -61,63 +53,22 @@ namespace PointCloudWeb.Server.Models
 
         public string Name { get; set; }
 
-        public IList<Point> Points => _points;
+        public IList<Point> Points { get; }
 
-        // ReSharper disable once MemberCanBePrivate.Global
-        public Matrix4x4 Transformation
-        {
-            get => _transformation;
-            set
-            {
-                _transformation = value;
-                TransformationChanged();
-            }
-        }
+        public Vector3 Transformation { get; set; }
+        public Vector3 Rotation { get; set; }
 
-        public IList<Point> TransformedPoints { get; private set; }
-
-        private Point GetTransformedPoint(Point point)
-        {
-            if (Transformation.IsIdentity)
-                return new Point(point.X, point.Y, point.Z);
-
-            var v = new Vector3(point.X, point.Y, point.Z);
-            v = Vector3.Transform(v, Transformation);
-
-            return new Point(NumericUtils.Round(v.X), NumericUtils.Round(v.Y), NumericUtils.Round(v.Z));
-        }
-
-        private void PointsCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
-        {
-            if (TransformedPoints.Count > 0)
-                TransformationChanged();
-        }
-
-        private void TransformationChanged()
-        {
-            TransformedPoints.Clear();
-
-            if (Transformation.IsIdentity)
-                return;
-
-            foreach (var point in Points)
-            {
-                var transformedPoint = GetTransformedPoint(point);
-                TransformedPoints.Add(transformedPoint);
-            }
-        }
 
         // ReSharper disable once MemberCanBePrivate.Global
         public string ToStringXyz()
         {
             var stringBuilder = new StringBuilder();
-            foreach (var point in _points)
+            foreach (var point in Points)
             {
-                // + 0.001 Otherwise points are outside of the bounding box by a floating-error, then Potree-Converter fails
-                stringBuilder.AppendLine(string.Join(',', 
-                    (point.X).ToString(CultureInfo.InvariantCulture), 
-                    (point.Y).ToString(CultureInfo.InvariantCulture), 
-                    (point.Z).ToString(CultureInfo.InvariantCulture)
+                stringBuilder.AppendLine(string.Join(',',
+                        (point.X).ToString(CultureInfo.InvariantCulture),
+                        (point.Y).ToString(CultureInfo.InvariantCulture),
+                        (point.Z).ToString(CultureInfo.InvariantCulture)
                     )
                 );
             }
@@ -143,7 +94,7 @@ namespace PointCloudWeb.Server.Models
             cloudCompare.Start();
             cloudCompare.WaitForExit();
         }
-        
+
         public void WriteToLas(string fileName)
         {
             var fileNameXyz = Path.ChangeExtension(fileName, ".xyz");

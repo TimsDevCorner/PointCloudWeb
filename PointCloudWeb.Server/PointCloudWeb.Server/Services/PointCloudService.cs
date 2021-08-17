@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Numerics;
 using PointCloudWeb.Server.Models;
 using PointCloudWeb.Server.Utils;
 
@@ -73,11 +74,15 @@ namespace PointCloudWeb.Server.Services
 
         public PointCloud GetById(Guid id) => _pointClouds.GetById(id);
 
-        public void RegisterPointCloud(Guid id)
+        private void RegisterPointCloud(Guid id)
         {
             RaiseIfNotExists(id);
-            // var pointCloud = _pointClouds.GetById(id);
-            //
+
+            var pc = GetById(id);
+            
+            pc.Transformation = Vector3.Zero;
+            pc.Rotation = Vector3.Zero;
+
             // //the first can't be registered
             // if (_pointClouds.IndexOf(pointCloud) == 0)
             //     return;

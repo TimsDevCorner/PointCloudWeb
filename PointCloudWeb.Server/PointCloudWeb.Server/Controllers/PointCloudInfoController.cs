@@ -3,6 +3,7 @@ using PointCloudWeb.Server.Models;
 using PointCloudWeb.Server.Services;
 using System;
 using System.Collections.Generic;
+using System.Numerics;
 
 namespace PointCloudWeb.Server.Controllers
 {
@@ -17,7 +18,8 @@ namespace PointCloudWeb.Server.Controllers
             _pointCloudService = pointCloudService;
         }
 
-        private PointCloudInfoDto ConvertPointCloudToDto(PointCloud pc) => new PointCloudInfoDto(pc.Id, pc.Name);
+        private static PointCloudInfoDto ConvertPointCloudToDto(PointCloud pc) =>
+            new PointCloudInfoDto(pc.Id, pc.Name, pc.Rotation, pc.Transformation);
 
         [HttpGet]
         public IList<PointCloudInfoDto> GetAll()
@@ -57,7 +59,11 @@ namespace PointCloudWeb.Server.Controllers
             var pc = _pointCloudService.GetById(newPc.Id);
             if (pc == null)
                 return new NotFoundResult();
+
             pc.Name = newPc.Name;
+            pc.Rotation = new Vector3(newPc.Rotation.X, newPc.Rotation.Y, newPc.Rotation.Z);
+            pc.Transformation = new Vector3(newPc.Transformation.X, newPc.Transformation.Y, newPc.Transformation.Z);
+
             return ConvertPointCloudToDto(pc);
         }
     }
