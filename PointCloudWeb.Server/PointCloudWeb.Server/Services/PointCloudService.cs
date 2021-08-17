@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using PointCloudWeb.Server.Models;
+using PointCloudWeb.Server.Utils;
 
 namespace PointCloudWeb.Server.Services
 {
@@ -37,7 +38,7 @@ namespace PointCloudWeb.Server.Services
 
         private void InitSampleData()
         {
-            //EthTestData.CreateData(this);
+            EthTestData.CreateData(this);
         }
 
         private void RaiseIfNotExists(Guid id)

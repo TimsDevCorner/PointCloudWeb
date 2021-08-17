@@ -11,8 +11,10 @@ namespace PointCloudWeb.Server
             PotreeConverterExe = basePath + "/PointCloudWeb.Server/Tools/PotreeConverter/PotreeConverter.exe";
             TempPath = basePath + "/temp";
             CloudCompareExe = "C:/Program Files/CloudCompare/CloudCompare.exe";
+            LasToolsTxt2Las = basePath + "/PointCloudWeb.Server/Tools/LAStools/txt2las.exe";
         }
 
+        public static string LasToolsTxt2Las { get;  }
         public static string PotreeDataPath { get; }
         public static string PotreeConverterExe { get; }
         public static string TempPath { get; }

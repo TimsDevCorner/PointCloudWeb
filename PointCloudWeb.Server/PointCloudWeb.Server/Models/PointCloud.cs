@@ -115,9 +115,9 @@ namespace PointCloudWeb.Server.Models
             {
                 // + 0.001 Otherwise points are outside of the bounding box by a floating-error, then Potree-Converter fails
                 stringBuilder.AppendLine(string.Join(',', 
-                    (point.X + 0.1).ToString(CultureInfo.InvariantCulture), 
-                    (point.Y + 0.1).ToString(CultureInfo.InvariantCulture), 
-                    (point.Z + 0.1).ToString(CultureInfo.InvariantCulture)
+                    (point.X).ToString(CultureInfo.InvariantCulture), 
+                    (point.Y).ToString(CultureInfo.InvariantCulture), 
+                    (point.Z).ToString(CultureInfo.InvariantCulture)
                     )
                 );
             }
@@ -131,7 +131,7 @@ namespace PointCloudWeb.Server.Models
             File.WriteAllText(fileName, ToStringXyz());
         }
 
-        public void WriteToLas(string fileName)
+        public void WriteToLasCloudCompare(string fileName)
         {
             var fileNameXyz = Path.ChangeExtension(fileName, ".xyz");
             WriteToXyz(fileNameXyz);
@@ -142,6 +142,19 @@ namespace PointCloudWeb.Server.Models
                 $"-SILENT -O \"{fileNameXyz}\" -C_EXPORT_FMT las -SAVE_CLOUDS FILE \"{fileName}\"";
             cloudCompare.Start();
             cloudCompare.WaitForExit();
+        }
+        
+        public void WriteToLas(string fileName)
+        {
+            var fileNameXyz = Path.ChangeExtension(fileName, ".xyz");
+            WriteToXyz(fileNameXyz);
+
+            var txt2Las = new Process();
+            txt2Las.StartInfo.FileName = Globals.LasToolsTxt2Las;
+            txt2Las.StartInfo.Arguments =
+                $"\"{fileNameXyz}\" -parse xyz -o \"{fileName}\"";
+            txt2Las.Start();
+            txt2Las.WaitForExit();
         }
     }
 
