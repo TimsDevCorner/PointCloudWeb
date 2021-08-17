@@ -7,6 +7,7 @@ import websockets
 import threading
 import collections
 import requests
+import uuid
 
 # f = open("PointCloudWeb.Scanner\datafile.txt","wt")
 # f.write("y, x, z\n")
@@ -23,11 +24,13 @@ scan_progress = 0
 scan_running = False
 stop_scan = False
 ws_message_queue = collections.deque(maxlen=100) 
-scan_id = "32a3acd0-4d67-4281-bf9c-3eefc093eca4"
+scan_id = ""
 
 async def init():
     global arduino, ws_message_queue, arduino_status, lidar, lidar_status
     try:
+        if arduino != None:
+            arduino.close()
         arduino = serial.Serial(port=arduino_port, baudrate=arduino_baud)
         ws_message_queue.appendleft("arduino connected " + arduino_port)
         arduino_status = True
@@ -62,7 +65,8 @@ def filterY(data):
     return temp + data[data.find("><"):data.find(">", data.find("><")+2)+1]
 
 def senddata(data,posy):
-    temp ="{\"Id\": "+scan_id+",\"ScanPoints\":["
+    global scan_id
+    temp ="{\"Id\": \""+scan_id+"\",\"ScanPoints\":["
     for x,y  in data.items():
          temp += ("{\"RAY\":" + str(posy) + ",\"RAX\":" + str(x) + ",\"DistanceMM\":" + str(y) + "},")
         #  f.write("{\"RAY\":" + str(posy) + ",\"RAX\":" + str(x) + ",\"DistanceMM\":" + str(y) + "},")
@@ -76,11 +80,13 @@ def startScaner(mode):
     global scan_progress, lidar, stop_scan, scan_id
     if lidar_status == True:
         ws_message_queue.appendleft(str(lidar.GetDeviceInfo()))
+        scan_id = str(uuid.uuid4())
+        ws_message_queue.appendleft("Scan ID: " + scan_id)
         gen = lidar.StartScanning()
         if mode == "0":
             print("Mode 0")
             ws_message_queue.appendleft("<scan>running")
-            for y in range(19):
+            for y in range(1):
                 if(stop_scan == True):
                     break
                 print("send data")
@@ -90,7 +96,7 @@ def startScaner(mode):
                 time.sleep(2)
                 scan_progress = round(y/18*100)
                 ws_message_queue.appendleft("<progress>" + str(scan_progress))
-            requests.put(url='http://localhost:35588/scandata', data='finished/'+scan_id, headers={'content-type': 'application/json'})
+            r = requests.put(url='http://localhost:35588/scandata/finished/'+scan_id)
             setY(0)
             lidar.StopScanning()
         elif mode == "1":
@@ -104,7 +110,7 @@ def startScaner(mode):
                 time.sleep(1)
                 scan_progress  = round(y/90*100)
                 ws_message_queue.appendleft("<progress>" + str(scan_progress))
-            requests.put(url='http://localhost:35588/scandata', data='finished/'+scan_id, headers={'content-type': 'application/json'})
+            r = requests.put(url='http://localhost:35588/scandata/finished/'+scan_id)
             setY(0)
             lidar.StopScanning()
         elif mode == "2":
@@ -118,7 +124,7 @@ def startScaner(mode):
                 time.sleep(1)
                 scan_progress  = round(y/360*100)
                 ws_message_queue.appendleft("<progress>" + str(scan_progress))
-            requests.put(url='http://localhost:35588/scandata', data='finished/'+scan_id, headers={'content-type': 'application/json'})
+            r = requests.put(url='http://localhost:35588/scandata/finished/'+scan_id)
             setY(0)
             lidar.StopScanning()
         else:
@@ -202,6 +208,7 @@ finally:
     print("set stop_scan")
     try:
         setY(0)
+        arduino.close()
         print("reset stepper")
     except:
         print("can´t reset stepper")
