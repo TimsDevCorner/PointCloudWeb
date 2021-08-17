@@ -70,6 +70,9 @@
         // material.size = 1;
         // material.pointSizeType = Potree.PointSizeType.ADAPTIVE;
 
+        pc.rotation.set(pointCloud.rotation.x, pointCloud.rotation.y, pointCloud.rotation.z);
+        pc.position.set(pointCloud.transformation.x, pointCloud.transformation.y, pointCloud.transformation.z);
+
         loadedPointClouds.push({id: pointCloud.id, pointCloud: pc})
     }
 
@@ -84,6 +87,8 @@
                     entry.pointCloud.visible = !entry.pointCloud.visible;
                     entry.pointCloud.visible = !entry.pointCloud.visible;
                 }
+                entry.pointCloud.rotation.set(pointClouds[i].rotation.x, pointClouds[i].rotation.y, pointClouds[i].rotation.z);
+                entry.pointCloud.position.set(pointClouds[i].transformation.x, pointClouds[i].transformation.y, pointClouds[i].transformation.z);
             } else {
                 loadByPc(pointClouds[i])
             }
