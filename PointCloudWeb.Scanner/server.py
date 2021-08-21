@@ -1,7 +1,7 @@
 # Importing Libraries
 import serial
 import time
-import PyLidar3
+import lidar3
 import asyncio
 import websockets
 import threading
@@ -9,11 +9,10 @@ import collections
 import requests
 import uuid
 
-# f = open("PointCloudWeb.Scanner\datafile.txt","wt")
-# f.write("y, x, z\n")
+f = open("PointCloudWeb.Scanner\datafile.txt","wt")
 
 arduino_status = False
-arduino_port = "COM9"
+arduino_port = "COM10"
 arduino_baud = 9600
 arduino = None
 lidar_status = False
@@ -38,7 +37,7 @@ async def init():
         ws_message_queue.appendleft("can not connect to arduino! " + arduino_port)
         arduino_status = False
     try:
-        lidar = PyLidar3.YdLidarX4(port=lidar_port,chunk_size=lidar_chunk_size) #PyLidar3.your_version_of_lidar(port,chunk_size) 
+        lidar = lidar3.YdLidarX4(port=lidar_port,chunk_size=lidar_chunk_size) #PyLidar3.your_version_of_lidar(port,chunk_size) 
         if(lidar.Connect()):
             lidar_status = True
             ws_message_queue.appendleft("lidar connected " + lidar_port)
@@ -68,10 +67,12 @@ def senddata(data,posy):
     global scan_id
     temp ="{\"Id\": \""+scan_id+"\",\"ScanPoints\":["
     for x,y  in data.items():
-         temp += ("{\"RAY\":" + str(posy) + ",\"RAX\":" + str(x) + ",\"DistanceMM\":" + str(y) + "},")
-        #  f.write("{\"RAY\":" + str(posy) + ",\"RAX\":" + str(x) + ",\"DistanceMM\":" + str(y) + "},")
+        if y != 0:
+            temp += ("{\"RAY\":" + str(posy) + ",\"RAX\":" + str(x) + ",\"DistanceMM\":" + str(y) + "},")
+        # f.write("{\"RAY\":" + str(posy) + ",\"RAX\":" + str(x) + ",\"DistanceMM\":" + str(y) + "},")
     l = len(temp)
     temp = temp[:l-1] + "]}"
+    f.write(temp)
     r = requests.put(url='http://localhost:35588/scandata', data=temp, headers={'content-type': 'application/json'})
     #print(r.status_code)
 
@@ -86,7 +87,7 @@ def startScaner(mode):
         if mode == "0":
             print("Mode 0")
             ws_message_queue.appendleft("<scan>running")
-            for y in range(1):
+            for y in range(19):
                 if(stop_scan == True):
                     break
                 print("send data")
@@ -129,7 +130,7 @@ def startScaner(mode):
             lidar.StopScanning()
         else:
             ws_message_queue.appendleft("mode error")
-        #f.close()
+        f.close()
         if(stop_scan == True):
             stop_scan = False
             ws_message_queue.appendleft("<scan>canceld")
