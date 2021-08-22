@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Numerics;
 using PointCloudWeb.Server.Models;
 using PointCloudWeb.Server.Utils;
 
@@ -10,13 +9,13 @@ namespace PointCloudWeb.Server.Services
 {
     public class PointCloudService
     {
-        //private readonly IPointCloudRegistrationService pointCloudRegistration;
+        private readonly IPointCloudRegistrationService _pointCloudRegistration;
         private readonly PointCloudCollection _pointClouds;
 
-        public PointCloudService( /*IPointCloudRegistrationService pointCloudRegistration*/)
+        public PointCloudService( IPointCloudRegistrationService pointCloudRegistration)
         {
             _pointClouds = new PointCloudCollection();
-            //this.pointCloudRegistration = pointCloudRegistration;
+            _pointCloudRegistration = pointCloudRegistration;
             InitSampleData();
         }
 
@@ -78,17 +77,18 @@ namespace PointCloudWeb.Server.Services
         {
             RaiseIfNotExists(id);
 
-            var pc = GetById(id);
+            var source = GetById(id);
             
-            pc.Transformation = Vector3.Zero;
-            pc.Rotation = Vector3.Zero;
+            //the first can't be registered
+            if (_pointClouds.IndexOf(source) == 0)
+                return;
+            
+            var target = _pointClouds[_pointClouds.IndexOf(source) - 1];
 
-            // //the first can't be registered
-            // if (_pointClouds.IndexOf(pointCloud) == 0)
-            //     return;
-
-            //var transformation = pointCloudRegistration.RegisterPointCloud(pointCloud, pointClouds[0]);
-            //pointCloud.Transformation = transformation;
+            var result = _pointCloudRegistration.RegisterPointCloud(source, target);
+            
+            source.Rotation = result.Rotation;
+            source.Transformation = result.Transformation;
         }
 
         public void RegisterPointClouds()

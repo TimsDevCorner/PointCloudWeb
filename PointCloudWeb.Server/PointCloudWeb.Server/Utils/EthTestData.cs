@@ -37,11 +37,11 @@ namespace PointCloudWeb.Server.Utils
 
         public static void CreateData(PointCloudService pointCloudService)
         {
-            var pc = pointCloudService.AddPointCloud();
+            var pc = pointCloudService.AddPointCloud(new Guid("c4b9b7fc-0b97-4f52-ad1b-737aeca5ba97"));
             LoadPointCloudFromEthFile(pc, "ETH-Data/Hokuyo_0.csv");
             pointCloudService.PointCloudCompleted(pc.Id);
 
-            pc = pointCloudService.AddPointCloud();
+            pc = pointCloudService.AddPointCloud(new Guid("c620b175-ace8-42e5-bf29-55b6c99372bc"));
             LoadPointCloudFromEthFile(pc, "ETH-Data/Hokuyo_1.csv");
             pointCloudService.PointCloudCompleted(pc.Id);
         }

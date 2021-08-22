@@ -51,6 +51,7 @@ namespace PointCloudWeb.Server
             services.AddSingleton<PointCloudService>();
             services.AddTransient<ScanConverterService>();
             services.AddTransient<ScanDataService>();
+            services.AddTransient<IPointCloudRegistrationService, PointCloudRegistrationServiceTeaerPp>();
             services.AddControllers();
         }
     }

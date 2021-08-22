@@ -63,15 +63,60 @@ namespace PointCloudWeb.Server.Models
         public string ToStringXyz()
         {
             var stringBuilder = new StringBuilder();
-            foreach (var point in Points)
+
+            // var maxPoints = 5_000;
+
+            var takeEvery = 1;//Points.Count / maxPoints;
+
+            for (var i = 0; i < Points.Count; i++)
             {
+                if (i % takeEvery != 0)
+                    continue;
+                var point = Points[i];
                 stringBuilder.AppendLine(string.Join(',',
-                        (point.X).ToString(CultureInfo.InvariantCulture),
-                        (point.Y).ToString(CultureInfo.InvariantCulture),
-                        (point.Z).ToString(CultureInfo.InvariantCulture)
+                        point.X.ToString(CultureInfo.InvariantCulture),
+                        point.Y.ToString(CultureInfo.InvariantCulture),
+                        point.Z.ToString(CultureInfo.InvariantCulture)
                     )
                 );
             }
+
+            return stringBuilder.ToString();
+        }
+
+        private string ToStringPly(int maxPoints)
+        {
+            var stringBuilder = new StringBuilder();
+            stringBuilder.Append("ply\n");
+            stringBuilder.Append("format ascii 1.0\n");
+
+            stringBuilder.Append($"element vertex COUNT_PLACEHOLDER {Points.Count}\n");
+            stringBuilder.Append("property float x\n");
+            stringBuilder.Append("property float y\n");
+            stringBuilder.Append("property float z\n");
+            stringBuilder.Append("end_header\n");
+
+            if (maxPoints == 0)
+                maxPoints = Points.Count;
+
+            var takeEvery = Points.Count / maxPoints;
+            var count = 0;
+
+            for (var i = 0; i < Points.Count; i++)
+            {
+                if (i % takeEvery != 0)
+                    continue;
+                count += 1;
+                var point = Points[i];
+                stringBuilder.Append(string.Join(' ',
+                        point.X,
+                        point.Y,
+                        point.Z
+                    ) + "\n"
+                );
+            }
+
+            stringBuilder.Replace("COUNT_PLACEHOLDER", count.ToString());
 
             return stringBuilder.ToString();
         }
@@ -80,6 +125,12 @@ namespace PointCloudWeb.Server.Models
         public void WriteToXyz(string fileName)
         {
             File.WriteAllText(fileName, ToStringXyz());
+        }
+
+        // ReSharper disable once MemberCanBePrivate.Global
+        public void WriteToPly(string fileName, int maxPoints)
+        {
+            File.WriteAllText(fileName, ToStringPly(maxPoints));
         }
 
         public void WriteToLasCloudCompare(string fileName)

@@ -3,8 +3,19 @@ using System.Numerics;
 
 namespace PointCloudWeb.Server.Services
 {
-    public interface IPointCloudRegistationService
+    public class RegistrationResult
     {
-        public Matrix4x4 RegisterPointCloud(PointCloud source, PointCloud target);
+        public RegistrationResult()
+        {
+            Transformation = Vector3.Zero;
+            Rotation = Vector3.Zero;
+        }
+        
+        public Vector3 Transformation { get; set; }
+        public Vector3 Rotation { get; set; }
+    }
+    public interface IPointCloudRegistrationService
+    {
+        public RegistrationResult RegisterPointCloud(PointCloud source, PointCloud target);
     }
 }
