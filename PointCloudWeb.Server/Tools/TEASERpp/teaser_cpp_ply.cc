@@ -23,6 +23,10 @@ inline double getAngularError(Eigen::Matrix3d R_exp, Eigen::Matrix3d R_est)
 
 int main(int argc, char **argv)
 {
+  std::ofstream out("/mnt/c/Users/timwu/source/repos/PointCloudWeb/PointCloudWeb.Server/Tools/TEASERpp/build/out.txt");
+  std::streambuf *coutbuf = std::cout.rdbuf(); //save old buf
+  std::cout.rdbuf(out.rdbuf());                //redirect std::cout to out.txt!
+
   std::cout << "You have entered " << argc
             << " arguments:"
             << "\n";
@@ -91,4 +95,7 @@ int main(int argc, char **argv)
             << std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count() /
                    1000000.0
             << std::endl;
+
+  //reset to standard output again, otherwise an error occurs
+  std::cout.rdbuf(coutbuf);
 }
