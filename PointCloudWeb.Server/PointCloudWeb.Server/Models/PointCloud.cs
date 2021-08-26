@@ -90,7 +90,7 @@ namespace PointCloudWeb.Server.Models
             stringBuilder.Append("ply\n");
             stringBuilder.Append("format ascii 1.0\n");
 
-            stringBuilder.Append($"element vertex COUNT_PLACEHOLDER {Points.Count}\n");
+            stringBuilder.Append("element vertex COUNT_PLACEHOLDER\n");
             stringBuilder.Append("property float x\n");
             stringBuilder.Append("property float y\n");
             stringBuilder.Append("property float z\n");

@@ -23,7 +23,7 @@ inline double getAngularError(Eigen::Matrix3d R_exp, Eigen::Matrix3d R_est)
 
 int main(int argc, char **argv)
 {
-  std::ofstream out("/mnt/c/Users/timwu/source/repos/PointCloudWeb/PointCloudWeb.Server/Tools/TEASERpp/build/out.txt");
+  std::ofstream out(argv[1]);
   std::streambuf *coutbuf = std::cout.rdbuf(); //save old buf
   std::cout.rdbuf(out.rdbuf());                //redirect std::cout to out.txt!
 
@@ -34,8 +34,8 @@ int main(int argc, char **argv)
   for (int i = 0; i < argc; ++i)
     std::cout << argv[i] << "\n";
 
-  auto src_fileName = argv[1];
-  auto tgt_fileName = argv[2];
+  auto src_fileName = argv[2];
+  auto tgt_fileName = argv[3];
 
   // Load the .ply file
   teaser::PLYReader reader;
