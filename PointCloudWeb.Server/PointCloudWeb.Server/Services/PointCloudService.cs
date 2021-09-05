@@ -104,8 +104,8 @@ namespace PointCloudWeb.Server.Services
 
         public void PointCloudCompleted(Guid id)
         {
-            RegisterPointCloud(id);
             GeneratePotreeData(id);
+            RegisterPointCloud(id);
         }
     }
 }

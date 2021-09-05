@@ -100,6 +100,8 @@ namespace PointCloudWeb.Server.Models
                 maxPoints = Points.Count;
 
             var takeEvery = Points.Count / maxPoints;
+            if (takeEvery < 1)
+                takeEvery = 1;
             var count = 0;
 
             for (var i = 0; i < Points.Count; i++)

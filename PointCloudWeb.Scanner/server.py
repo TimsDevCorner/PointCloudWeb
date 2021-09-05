@@ -12,7 +12,7 @@ import uuid
 f = open("PointCloudWeb.Scanner\datafile.txt","wt")
 
 arduino_status = False
-arduino_port = "COM10"
+arduino_port = "COM9"
 arduino_baud = 9600
 arduino = None
 lidar_status = False
@@ -66,10 +66,10 @@ def sendData(data,posy):
     for x,y  in data.items():
         if y != 0:
             temp += ("{\"RAY\":" + str(posy) + ",\"RAX\":" + str(x) + ",\"DistanceMM\":" + str(y) + "},")
-        # f.write("{\"RAY\":" + str(posy) + ",\"RAX\":" + str(x) + ",\"DistanceMM\":" + str(y) + "},")
+         #f.write("{\"RAY\":" + str(posy) + ",\"RAX\":" + str(x) + ",\"DistanceMM\":" + str(y) + "},")
     l = len(temp)
     temp = temp[:l-1] + "]}"
-    #f.write(temp)
+    f.write(temp)
     r = requests.put(url='http://localhost:35588/scandata', data=temp, headers={'content-type': 'application/json'})
     #print(r.status_code)
 
@@ -80,14 +80,16 @@ def startScanner(mode):
         ws_message_queue.appendleft(str(lidar.GetDeviceInfo()))
         scan_id = str(uuid.uuid4())
         ws_message_queue.appendleft("Scan ID: " + scan_id)
-        gen = lidar.StartScanning()
+        #gen = lidar.StartScanning()
         if mode == "0":
             print("Mode 0")
             ws_message_queue.appendleft("<scan>running")
             for y in range(19):
                 if(stop_scan == True):
                     break
+                gen = lidar.StartScanning()
                 sendData(next(gen),y*10)
+                lidar.StopScanning()
                 time.sleep(2)
                 setY(y*10)
                 time.sleep(2)
@@ -95,13 +97,15 @@ def startScanner(mode):
                 ws_message_queue.appendleft("<progress>" + str(scan_progress))
             r = requests.put(url='http://localhost:35588/scandata/finished/'+scan_id)
             setY(0)
-            lidar.StopScanning()
+            #lidar.StopScanning()
         elif mode == "1":
             ws_message_queue.appendleft("<scan>running")
             for y in range(91):
                 if(stop_scan == True):
                     break
+                gen = lidar.StartScanning()
                 sendData(next(gen),y*2)
+                lidar.StopScanning()
                 time.sleep(1)
                 setY(y*2)
                 time.sleep(1)
@@ -109,13 +113,15 @@ def startScanner(mode):
                 ws_message_queue.appendleft("<progress>" + str(scan_progress))
             r = requests.put(url='http://localhost:35588/scandata/finished/'+scan_id)
             setY(0)
-            lidar.StopScanning()
+            #lidar.StopScanning()
         elif mode == "2":
             ws_message_queue.appendleft("<scan>running")
             for y in range(361):
                 if(stop_scan == True):
                     break
+                gen = lidar.StartScanning()
                 sendData(next(gen),y*0.5)
+                lidar.StopScanning()
                 time.sleep(1)
                 setY(y*0.5)
                 time.sleep(1)
@@ -123,7 +129,7 @@ def startScanner(mode):
                 ws_message_queue.appendleft("<progress>" + str(scan_progress))
             r = requests.put(url='http://localhost:35588/scandata/finished/'+scan_id)
             setY(0)
-            lidar.StopScanning()
+            #lidar.StopScanning()
         else:
             ws_message_queue.appendleft("mode error")
         f.close()
