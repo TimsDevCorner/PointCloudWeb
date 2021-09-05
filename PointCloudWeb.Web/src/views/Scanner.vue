@@ -22,7 +22,6 @@
         </div>
       </ul>
     </div>
-      <!--<button v-on:click="connection_status = !connection_status" >test</button>-->
       <button v-on:click="progress = 0, logs = []" >clear logs</button>
   </div>
 </template>
@@ -71,7 +70,6 @@ export default {
       if(message.search("<") != -1){
         that.command = message.substr(message.search("<")+1, message.search(">")-1)
         that.value = message.substr(message.search(">")+1)
-        //console.log("command: " + that.command + " / value: " + that.value)
         this.action(that.command, that.value)
       }
       else{
@@ -143,19 +141,17 @@ li {
 .progressbar {
   background-color: grey;
   border-radius: 7px;
-  /* (height of inner div) / 2 + padding */
   padding: 3px;
   margin: auto;
 }
 
 .progressbar>div {
-  /* Adjust with JavaScript */
   height: 20px;
   border-radius: 4px;
 }
 
 .button {
-  background-color: #4CAF50; /* Green */
+  background-color: #4CAF50;
   border: none;
   color: white;
   padding: 15px 32px;
@@ -173,6 +169,6 @@ li {
 
 .button2 {background-color: #00ba9b;}
 .button3 {background-color: #008cff}
-.button4 {background-color: #f44336;} /* Red */ 
+.button4 {background-color: #f44336;}
 
 </style>

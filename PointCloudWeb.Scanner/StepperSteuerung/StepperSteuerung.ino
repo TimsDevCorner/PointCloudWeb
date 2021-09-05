@@ -2,7 +2,6 @@
 
 double degreeY = 0;
 String rxData = ""; //Empfangen
-
 CheapStepper stepper (8,9,10,11);
 
 void setup() {
@@ -11,7 +10,6 @@ void setup() {
 }
 
 void loop() {
-
   stepper.run();
   // send data only when you receive data:
   if (Serial.available() > 0) {
@@ -37,17 +35,11 @@ void loop() {
 }
 
 String moveMotor(double y){
-
-  
   if(y < degreeY){
     stepper.newMoveDegrees (true, calculateMove(y)); //true = im Uhrzeigersinn drehen
-    //motor.step((int)calculateStepps(degreeY - y), BACKWARD, INTERLEAVE); //"interleave" means that it alternates between single and double to get twice the resolution (but of course its half the speed)
-    //motor.release();  // Strom sparen und Überhitzung des Controllers vorbeugen!
   }
   else{
     stepper.newMoveDegrees (false, calculateMove(y)); //false = gegen Uhrzeigersinn drehen
-    //motor.step((int)calculateStepps(y - degreeY), FORWARD, INTERLEAVE);
-    //motor.release();
   }
   degreeY = y;
   return "<move><" + (String)y + ">";

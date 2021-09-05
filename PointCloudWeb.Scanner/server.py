@@ -1,7 +1,7 @@
 # Importing Libraries
 import serial
 import time
-import lidar3
+import PyLidar3
 import asyncio
 import websockets
 import threading
@@ -37,7 +37,7 @@ async def init():
         ws_message_queue.appendleft("can not connect to arduino! " + arduino_port)
         arduino_status = False
     try:
-        lidar = lidar3.YdLidarX4(port=lidar_port,chunk_size=lidar_chunk_size) #PyLidar3.your_version_of_lidar(port,chunk_size) 
+        lidar = PyLidar3.YdLidarX4(port=lidar_port,chunk_size=lidar_chunk_size) #PyLidar3.your_version_of_lidar(port,chunk_size) 
         if(lidar.Connect()):
             lidar_status = True
             ws_message_queue.appendleft("lidar connected " + lidar_port)
@@ -51,19 +51,16 @@ async def init():
     else:
         ws_message_queue.appendleft("<connection>false")
 
-def arduino_write_read(x):
-    arduino.write(bytes(x, 'utf-8'))
+def setY(y):
+    arduino.write(bytes("<set><"+str(y)+">", 'utf-8'))
     data1 = arduino.readline()
     return filterY(str(data1))
-
-def setY(y):
-    tmp = arduino_write_read("<set><"+str(y)+">")
 
 def filterY(data):
     temp = data[data.find("<"):data.find(">")]
     return temp + data[data.find("><"):data.find(">", data.find("><")+2)+1]
 
-def senddata(data,posy):
+def sendData(data,posy):
     global scan_id
     temp ="{\"Id\": \""+scan_id+"\",\"ScanPoints\":["
     for x,y  in data.items():
@@ -72,14 +69,14 @@ def senddata(data,posy):
         # f.write("{\"RAY\":" + str(posy) + ",\"RAX\":" + str(x) + ",\"DistanceMM\":" + str(y) + "},")
     l = len(temp)
     temp = temp[:l-1] + "]}"
-    f.write(temp)
+    #f.write(temp)
     r = requests.put(url='http://localhost:35588/scandata', data=temp, headers={'content-type': 'application/json'})
     #print(r.status_code)
 
 
-def startScaner(mode):
-    global scan_progress, lidar, stop_scan, scan_id
-    if lidar_status == True:
+def startScanner(mode):
+    global scan_progress, lidar, stop_scan, scan_id, arduino_status
+    if lidar_status == True and arduino_status == True:
         ws_message_queue.appendleft(str(lidar.GetDeviceInfo()))
         scan_id = str(uuid.uuid4())
         ws_message_queue.appendleft("Scan ID: " + scan_id)
@@ -90,10 +87,9 @@ def startScaner(mode):
             for y in range(19):
                 if(stop_scan == True):
                     break
-                print("send data")
-                senddata(next(gen),y*10)
+                sendData(next(gen),y*10)
                 time.sleep(2)
-                setY( y*10)
+                setY(y*10)
                 time.sleep(2)
                 scan_progress = round(y/18*100)
                 ws_message_queue.appendleft("<progress>" + str(scan_progress))
@@ -105,7 +101,7 @@ def startScaner(mode):
             for y in range(91):
                 if(stop_scan == True):
                     break
-                senddata(next(gen),y*2)
+                sendData(next(gen),y*2)
                 time.sleep(1)
                 setY(y*2)
                 time.sleep(1)
@@ -119,7 +115,7 @@ def startScaner(mode):
             for y in range(361):
                 if(stop_scan == True):
                     break
-                senddata(next(gen),y*0.5)
+                sendData(next(gen),y*0.5)
                 time.sleep(1)
                 setY(y*0.5)
                 time.sleep(1)
@@ -151,21 +147,21 @@ async def wsaction(command, value):
     if command == "start":
         if value == "0":
             ws_message_queue.appendleft("start scan on low resolution")
-            x = threading.Thread(target=startScaner, args=(value))
+            x = threading.Thread(target=startScanner, args=(value))
             x.start()
         elif value =="1":
             ws_message_queue.appendleft("start scan on medium resolution")
-            x = threading.Thread(target=startScaner, args=(value))
+            x = threading.Thread(target=startScanner, args=(value))
             x.start()
         elif value =="2":
             ws_message_queue.appendleft("start scan on high resolution")
-            x = threading.Thread(target=startScaner, args=(value))
+            x = threading.Thread(target=startScanner, args=(value))
             x.start()
         else:
             ws_message_queue.appendleft("mode error")
-    elif command == "connect" and arduino  and lidar != None:
-        ws_message_queue.appendleft("try to connect to Adruino and LIDAR")
-        await init()
+    # elif command == "connect" and arduino  and lidar != None:
+    #     ws_message_queue.appendleft("try to connect to Adruino and LIDAR")
+    #     await init()
     elif command == "status":
         ws_message_queue.appendleft("progress: " + scan_progress)
     elif command == "stop":
