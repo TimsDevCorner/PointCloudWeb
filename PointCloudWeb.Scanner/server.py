@@ -12,7 +12,7 @@ import uuid
 f = open("PointCloudWeb.Scanner\datafile.txt","wt")
 
 arduino_status = False
-arduino_port = "COM9"
+arduino_port = "COM10"
 arduino_baud = 9600
 arduino = None
 lidar_status = False
